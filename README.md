@@ -139,19 +139,26 @@ Each mode works independently — you don't need the full lifecycle to use any s
 
 ### Automating with Hooks (optional)
 
-Install project-level hooks to automate the lifecycle:
+Install project-level hooks to automate the digest → code → update lifecycle:
 
 ```
-/code-to-docs --hooks setup [vault-path]
-/code-to-docs --hooks teardown
+/code-to-docs --hooks setup              # uses default ./docs-vault
+/code-to-docs --hooks setup ./my-vault   # custom vault path
+/code-to-docs --hooks teardown           # remove hooks (preserves other project hooks)
 ```
 
-| Hook | Fires On | Does |
-|------|----------|------|
-| `digest-on-start.sh` | Session start | Injects vault summary into context (modules, issues, staleness) |
-| `update-hint-on-commit.sh` | `git commit` | Reminds Claude to suggest `--update` when session ends |
+Setup writes two hooks into the project's `.claude/settings.json`:
 
-Hooks are project-local (`.claude/settings.json`), lightweight (read-only shell scripts), and removable with teardown. Set `CODE_TO_DOCS_VAULT` env var to override vault path.
+| Hook | Event | Trigger | What It Does |
+|------|-------|---------|-------------|
+| `digest-on-start.sh` | `SessionStart` | Every new Claude Code session | Injects vault summary into Claude's context: module list, last run info, open issue count, staleness warning if code changed since last doc run |
+| `update-hint-on-commit.sh` | `PostToolUse` | Any `git commit` command | Reminds Claude to suggest `--update` when the coding session is complete |
+
+Hooks are:
+- **Project-local** — written to `.claude/settings.json` in the project root, not global settings
+- **Read-only** — they read the vault state file and output text to stdout (which Claude Code injects into context), never modify files
+- **Non-destructive** — teardown removes only code-to-docs hooks, preserving any other hooks in the project settings
+- **Configurable** — set `CODE_TO_DOCS_VAULT` env var to override the vault path (defaults to `./docs-vault`)
 
 ### Arguments
 
@@ -163,6 +170,7 @@ Hooks are project-local (`.claude/settings.json`), lightweight (read-only shell 
 | `--digest` | No | — | Load existing vault context (read-only) |
 | `--scope` | No (digest only) | all (overview) | Comma-separated module names to load in full |
 | `--focus` | No (digest only) | `architecture` | `architecture`, `issues`, or `all` |
+| `--hooks` | No | — | `setup [vault-path]` or `teardown` — install/remove project-level automation hooks |
 | `--output` | No | `./docs-vault/` | Output path (relative to codebase root) |
 
 ## Output Structure
@@ -207,8 +215,11 @@ The `_state/analysis.json` file tracks:
 5. Synthesizes into dependency graph, architecture narrative, and aggregated issues
 
 **Phase 2 — Generation (parallel):**
+
+If the `obsidian` CLI is available, uses it for note creation and property management (see [Obsidian Integration](#obsidian-integration)). Otherwise falls back to direct file writes.
+
 - **Sonnet** agents: module docs (one per module), System Overview, health reports, full-mode extras
-- **Haiku** agents: Canvas, Dependency Map, Index, state file, Health Summary charts
+- **Haiku** agents: Canvas, Dependency Map, Documentation.base, Index, state file, Health Summary charts
 
 **Phase 3 — Verification:**
 - **Haiku** agent checks all wikilinks resolve and all files have complete frontmatter
