@@ -69,10 +69,12 @@ Read `analysis-guide.md` for detailed instructions.
 
 Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` for vault layout.
 
+**Before dispatching:** Check if `obsidian` CLI is available (`which obsidian`). If yes, use `obsidian create` with `silent` flag for note creation. If no, use direct file writes. See `output-structure.md` "Obsidian CLI Integration" for details.
+
 Dispatch in parallel where possible:
 
 1. **Sonnet agent**: `Architecture/System Overview.md` (narrative writing)
-2. **Haiku agents** (parallel): `Architecture/System Map.canvas`, `Architecture/Dependency Map.md`, `Index.md` (data transforms)
+2. **Haiku agents** (parallel): `Architecture/System Map.canvas`, `Architecture/Dependency Map.md`, `Documentation.base`, `Index.md` (data transforms)
 3. **Sonnet agents** (parallel, one per module): `Modules/{Name}.md` — each receives its module's analysis report + synthesis context
 4. **Sonnet agent**: `Health/` — Limitations.md, Code Review.md, Health Summary.md with severity charts
 5. (Full mode) **Sonnet agents**: `Patterns/`, `Onboarding/`, `Cross-Cutting/`

@@ -421,6 +421,12 @@ Rules:
 
 ---
 
-## 8. Dataview Queries
+## 8. Dataview Queries & Obsidian Bases
 
-Dataview query templates for Index.md are defined in `output-structure.md` (Index.md Template section). The queries depend on the frontmatter fields and tags defined in Section 1 above — specifically `title`, `language`, `complexity`, `status`, `type`, and `generated-at`, plus the `#code-docs` and `#{type}` tags.
+Two index mechanisms are generated — users can use either or both:
+
+**`Documentation.base`** (native, no plugins) — an Obsidian Bases catalog with interactive table/card views, filterable by type, complexity, language. See `output-structure.md` for the `.base` JSON schema.
+
+**`Index.md`** (Dataview plugin) — Dataview query templates defined in `output-structure.md` (Index.md Template section). The queries depend on the frontmatter fields and tags defined in Section 1 above — specifically `title`, `language`, `complexity`, `status`, `type`, and `generated-at`, plus the `#code-docs` and `#{type}` tags.
+
+Both depend on the same frontmatter schema. The `.base` file uses Obsidian's native property system; Dataview queries parse the YAML frontmatter directly. Consistency in frontmatter is critical for both to work.

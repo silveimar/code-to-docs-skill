@@ -2,7 +2,7 @@
 
 Supporting reference for the `code-to-docs` skill. Loaded on demand during Phase 2 (Documentation Generation).
 
-**Frontmatter:** All generated files require frontmatter — see `obsidian-templates.md` for the full schema. Dataview queries in Index.md depend on frontmatter fields (`title`, `language`, `complexity`, `status`, `type`, `generated-at`) and tags (`#code-docs`, `#module`, etc.).
+**Frontmatter:** All generated files require frontmatter — see `obsidian-templates.md` for the full schema. Both the Dataview queries in Index.md and the Bases catalog in Documentation.base depend on frontmatter fields (`title`, `language`, `complexity`, `status`, `type`, `generated-at`) and tags (`#code-docs`, `#module`, etc.).
 
 ---
 
@@ -21,7 +21,8 @@ Dispatch these as parallel agents where possible. Each agent receives only the d
 | `Patterns/{Name}.md` (full mode) | **Sonnet** | System-wide patterns from synthesis | Pattern identification + writing |
 | `Onboarding/` (full mode) | **Sonnet** | Full synthesis + module reports | Requires broad codebase understanding |
 | `Cross-Cutting/{Name}.md` (full mode) | **Sonnet** | Relevant cross-cutting data from synthesis | Requires cross-module reasoning |
-| `Index.md` | **Haiku** | Project name + timestamp + mode | Template fill |
+| `Documentation.base` | **Haiku** | Module list + metadata | Mechanical JSON assembly |
+| `Index.md` | **Haiku** | Project name + timestamp + mode | Template fill (Dataview fallback) |
 | `_state/analysis.json` | **Haiku** | Synthesis data | Mechanical JSON assembly |
 
 ---
@@ -50,7 +51,8 @@ docs-vault/
 │   ├── Limitations.md          # Architecture and component constraints
 │   ├── Code Review.md          # Bugs, risks, and improvement opportunities
 │   └── Health Summary.md       # Aggregate charts and severity breakdown
-└── Index.md                    # Hub page with Dataview queries
+├── Documentation.base          # Obsidian Bases catalog (native, no plugins needed)
+└── Index.md                    # Hub page with Dataview queries (fallback)
 ```
 
 ---
@@ -166,6 +168,80 @@ FROM #code-docs
 SORT generated-at DESC
 \`\`\`
 ```
+
+---
+
+## Documentation.base — Obsidian Bases Catalog
+
+Generate `Documentation.base` in the vault root. This provides a native Obsidian Bases view — interactive, filterable, no plugins required. It complements Index.md (which uses Dataview) rather than replacing it.
+
+The `.base` file is JSON. Structure:
+
+```json
+{
+  "headings": [
+    { "heading": "title", "type": "property" },
+    { "heading": "type", "type": "property" },
+    { "heading": "language", "type": "property" },
+    { "heading": "complexity", "type": "property" },
+    { "heading": "status", "type": "property" },
+    { "heading": "canonical-source", "type": "property" }
+  ],
+  "sourceType": "folder",
+  "source": "",
+  "filters": [
+    {
+      "field": "generated-by",
+      "operator": "is",
+      "value": "code-to-docs"
+    }
+  ],
+  "sort": [
+    { "field": "type", "order": "asc" },
+    { "field": "complexity", "order": "desc" }
+  ]
+}
+```
+
+This creates a table view of all generated docs, filterable by type, complexity, and language. Users can switch between table and card views, add computed columns, or modify filters directly in Obsidian.
+
+**Generation:** Haiku agent — this is a mechanical JSON transform from the module list and metadata.
+
+---
+
+## Obsidian CLI Integration (Opportunistic)
+
+At the start of Phase 2, check if the `obsidian` CLI is available:
+
+```bash
+which obsidian >/dev/null 2>&1
+```
+
+If available **and** Obsidian is running (the CLI requires a running instance), use it for note creation and property management. If not available, fall back to direct file writes — the current behavior, with no degradation.
+
+### When obsidian CLI is available
+
+| Operation | Command | Benefit over direct file write |
+|-----------|---------|-------------------------------|
+| Create note | `obsidian create name="{title}" content="{content}" path="{vault-path}" silent` | Wikilink resolution, property validation |
+| Set property | `obsidian property:set name="{key}" value="{val}" file="{title}"` | Obsidian-native property storage |
+| Verify backlinks | `obsidian backlinks file="{title}"` | Uses Obsidian's live graph, not grep |
+
+### When obsidian CLI is NOT available
+
+Fall back to direct file writes using the Write tool — identical to current behavior. This is the default and always-works path.
+
+### Integration rules
+
+- **Never require** the obsidian CLI — it is an enhancement, not a dependency
+- **Check once** at the start of Phase 2, store the result, and use it for all subsequent operations in the same run
+- **Use `silent` flag** on all `obsidian create` calls — do not open notes in the editor during generation
+- **Fall back on any error** — if an `obsidian create` call fails, retry with direct file write for that note
+- **Do not mix** — if obsidian CLI is available, use it for all notes in the run (consistency in how properties are stored)
+
+### Skill references
+
+When using obsidian CLI, the `obsidian-markdown`, `json-canvas`, and `obsidian-bases` skills contain the authoritative syntax references. Prefer those skills' conventions over the templates in this file when they conflict.
 
 ---
 

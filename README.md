@@ -184,7 +184,8 @@ docs-vault/
 ├── Patterns/                   # full mode only
 ├── Onboarding/                 # full mode only
 ├── Cross-Cutting/              # full mode only
-└── Index.md                    # Dataview queries
+├── Documentation.base          # Obsidian Bases catalog (native, no plugins)
+└── Index.md                    # Dataview queries (fallback for non-Bases users)
 ```
 
 The `_state/analysis.json` file tracks:
@@ -258,11 +259,38 @@ Three test scenarios in `tests/`:
 - `pressure-test-full-mode.md` — validates full mode additions
 - `pressure-test-parallel.md` — validates parallel dispatch discipline on 5+ modules
 
+## Obsidian Integration
+
+### Obsidian Bases (native, no plugins)
+
+Every vault includes a `Documentation.base` file — an interactive catalog of all generated docs with columns for type, complexity, language, and status. Users can filter, sort, switch between table/card views, and add computed columns directly in Obsidian. No Dataview plugin required.
+
+Index.md with Dataview queries is still generated as a fallback for users who prefer it or don't have Bases enabled.
+
+### Obsidian CLI (opportunistic)
+
+If the `obsidian` CLI is available and Obsidian is running, the skill uses it for note creation (`obsidian create`) and property management (`obsidian property:set`). This provides:
+
+- Native wikilink resolution (Obsidian handles renames automatically)
+- Property validation through Obsidian's storage system
+- Backlink verification via Obsidian's live graph
+
+If the CLI is not available, the skill falls back to direct file writes with no degradation. This is an enhancement, not a requirement.
+
+### Related Skills
+
+The skill integrates with other Obsidian plugin skills when available:
+
+| Skill | Used For |
+|-------|---------|
+| `obsidian-markdown` | Authoritative syntax for wikilinks, callouts, embeds, frontmatter |
+| `json-canvas` | Canvas file spec reference for System Map generation |
+| `obsidian-bases` | Bases file spec reference for Documentation.base generation |
+
 ## Future Enhancements
 
 - Configurable output format (portable markdown vs Obsidian-native)
 - Excalidraw diagram generation
-- Integration with `obsidian-cli` skill
 
 ## License
 
