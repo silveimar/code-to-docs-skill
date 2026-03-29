@@ -1,0 +1,36 @@
+{
+	"nodes":[
+		{"id":"frontend","type":"file","file":"Modules/Frontend.md","x":0,"y":0,"width":250,"height":60},
+		{"id":"production-server","type":"file","file":"Modules/Production Server.md","x":300,"y":0,"width":250,"height":60},
+		{"id":"scheduler","type":"file","file":"Modules/Scheduler.md","x":0,"y":150,"width":250,"height":60},
+		{"id":"stacks-and-git","type":"file","file":"Modules/Stacks and Git.md","x":300,"y":150,"width":250,"height":60},
+		{"id":"docker-engine","type":"file","file":"Modules/Docker Engine.md","x":0,"y":300,"width":250,"height":60},
+		{"id":"auth-and-security","type":"file","file":"Modules/Auth and Security.md","x":300,"y":300,"width":250,"height":60},
+		{"id":"hawser-edge","type":"file","file":"Modules/Hawser Edge.md","x":600,"y":300,"width":250,"height":60},
+		{"id":"database","type":"file","file":"Modules/Database.md","x":0,"y":450,"width":250,"height":60},
+		{"id":"infrastructure-services","type":"file","file":"Modules/Infrastructure Services.md","x":300,"y":450,"width":250,"height":60},
+		{"id":"go-collector","type":"file","file":"Modules/Go Collector.md","x":600,"y":450,"width":250,"height":60}
+	],
+	"edges":[
+		{"id":"e-fe-docker","fromNode":"frontend","fromSide":"bottom","toNode":"docker-engine","toSide":"top","label":"API calls"},
+		{"id":"e-fe-auth","fromNode":"frontend","fromSide":"bottom","toNode":"auth-and-security","toSide":"top","label":"API calls"},
+		{"id":"e-fe-stacks","fromNode":"frontend","fromSide":"bottom","toNode":"stacks-and-git","toSide":"top","label":"API calls"},
+		{"id":"e-fe-sched","fromNode":"frontend","fromSide":"bottom","toNode":"scheduler","toSide":"top","label":"API calls"},
+		{"id":"e-server-hawser","fromNode":"production-server","fromSide":"bottom","toNode":"hawser-edge","toSide":"top","label":"globalThis bridge"},
+		{"id":"e-server-docker","fromNode":"production-server","fromSide":"bottom","toNode":"docker-engine","toSide":"top","label":"globalThis bridge"},
+		{"id":"e-sched-docker","fromNode":"scheduler","fromSide":"bottom","toNode":"docker-engine","toSide":"top","label":"imports"},
+		{"id":"e-sched-stacks","fromNode":"scheduler","fromSide":"right","toNode":"stacks-and-git","toSide":"left","label":"imports"},
+		{"id":"e-sched-db","fromNode":"scheduler","fromSide":"bottom","toNode":"database","toSide":"top","label":"imports"},
+		{"id":"e-stacks-docker","fromNode":"stacks-and-git","fromSide":"bottom","toNode":"docker-engine","toSide":"top","label":"imports"},
+		{"id":"e-stacks-db","fromNode":"stacks-and-git","fromSide":"bottom","toNode":"database","toSide":"top","label":"imports"},
+		{"id":"e-docker-db","fromNode":"docker-engine","fromSide":"bottom","toNode":"database","toSide":"top","label":"imports"},
+		{"id":"e-docker-hawser","fromNode":"docker-engine","fromSide":"right","toNode":"hawser-edge","toSide":"left","label":"imports"},
+		{"id":"e-auth-db","fromNode":"auth-and-security","fromSide":"bottom","toNode":"database","toSide":"top","label":"imports"},
+		{"id":"e-auth-infra","fromNode":"auth-and-security","fromSide":"bottom","toNode":"infrastructure-services","toSide":"top","label":"imports"},
+		{"id":"e-hawser-db","fromNode":"hawser-edge","fromSide":"bottom","toNode":"database","toSide":"top","label":"imports"},
+		{"id":"e-hawser-auth","fromNode":"hawser-edge","fromSide":"left","toNode":"auth-and-security","toSide":"right","label":"imports"},
+		{"id":"e-hawser-infra","fromNode":"hawser-edge","fromSide":"bottom","toNode":"infrastructure-services","toSide":"top","label":"imports"},
+		{"id":"e-infra-db","fromNode":"infrastructure-services","fromSide":"left","toNode":"database","toSide":"right","label":"imports"},
+		{"id":"e-infra-docker","fromNode":"infrastructure-services","fromSide":"top","toNode":"docker-engine","toSide":"bottom","label":"imports"}
+	]
+}
