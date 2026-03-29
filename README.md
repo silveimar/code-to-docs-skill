@@ -1,6 +1,6 @@
 # code-to-docs
 
-A Claude Code skill that analyzes codebases and generates Obsidian-native documentation vaults with architecture diagrams, API references, codebase health assessments, and teaching-focused explanations at three audience levels.
+A Claude Code skill that analyzes codebases and generates Obsidian-native documentation vaults with architecture diagrams, API references, codebase health assessments, and teaching-focused explanations at three audience levels. Supports a full development lifecycle: digest existing docs at session start, code, then update docs at session end.
 
 ## What It Does
 
@@ -9,17 +9,24 @@ Point it at a codebase and it produces a complete Obsidian vault:
 - **Architecture docs** with Mermaid diagrams and a spatial Canvas map
 - **Module documentation** at three audience levels (beginner, intermediate, advanced)
 - **API reference** with function signatures, parameters, and return types
-- **Codebase health assessment** — limitations, bugs/risks, improvement opportunities with severity charts
-- **Educational code review** — before/after snippets showing what's wrong and how to fix it
+- **Codebase health assessment** — limitations, bugs/risks, improvement opportunities with Mermaid severity charts
+- **Educational code review** — before/after code snippets showing what's wrong and how to fix it
 - **Index pages** with Dataview queries for navigation
-- **Incremental contract** — state file tracking modules, dependencies, and issues for future change detection
+- **State tracking** — modules, dependencies, issues, and session history for incremental updates
 
-### Two Modes
+Beyond generation, the skill supports the full development lifecycle:
 
-| Mode | Generates |
-|------|-----------|
-| **quick** (default) | Architecture overview, module docs, API reference, health assessment, index |
+- **Digest** (`--digest`) — load existing vault context into a conversation before coding (read-only, token-budgeted)
+- **Update** (`--update`) — after coding, re-analyze only changed modules via `git diff`, merge with existing docs, track issue resolution
+
+### Modes
+
+| Mode | What It Does |
+|------|-------------|
+| **quick** (default) | Architecture overview, module docs, API reference, health assessment, index — all at three audience levels |
 | **full** | Everything in quick + design patterns, onboarding guides, cross-cutting concerns, tutorials |
+| **--update** | Incremental update — diffs against last run, re-analyzes affected modules, auto-selects quick/full |
+| **--digest** | Loads existing vault context into the conversation (read-only, no file writes) |
 
 ### Three Audience Levels
 
@@ -35,11 +42,11 @@ The skill uses Haiku, Sonnet, and Opus strategically to minimize token cost with
 
 | Tier | Model | Use |
 |------|-------|-----|
-| **Extract** | Haiku | Code extraction, mechanical generation (Canvas, Index, state file), verification |
+| **Extract** | Haiku | Code extraction, mechanical generation (Canvas, Index, state file), verification, digest |
 | **Write** | Sonnet | Narrative writing, pedagogical content, health report assembly |
 | **Reason** | Opus | Deep issue analysis (complex modules), cross-module synthesis (5+ modules) |
 
-Opus is used conditionally — only for modules rated High complexity, exceeding 1000 LOC, or involving concurrency/security, and for synthesis on codebases with 5+ modules or complex dependency graphs.
+Opus is used conditionally — only for modules rated High complexity, exceeding 1000 LOC, or involving concurrency/security, and for synthesis on codebases with 5+ modules or complex dependency graphs. Digest mode uses Haiku exclusively.
 
 ## Installation
 
@@ -77,7 +84,11 @@ cp skills/code-to-docs/* ~/.claude/skills/code-to-docs/
 /code-to-docs /path/to/codebase --update
 ```
 
-Auto-selects quick or full based on the scope of changes since the last run. Only re-analyzes affected modules.
+Reads `_state/analysis.json` from the existing vault, runs `git diff` against the stored commit, and re-analyzes only affected modules. Auto-selects quick or full based on scope of changes:
+- **Quick** — changes within existing modules only
+- **Full** — new modules detected, modules removed, dependency structure changed, or >50% of files changed
+
+Tracks issues across runs: resolved issues marked, new issues added, unchanged module issues carried forward.
 
 ### Digest Context (before coding)
 
@@ -87,7 +98,7 @@ Auto-selects quick or full based on the scope of changes since the last run. Onl
 /code-to-docs --digest ./docs-vault --focus all
 ```
 
-Loads existing vault context into the conversation — architecture, module summaries, known issues — without modifying any files.
+Loads existing vault context into the conversation — architecture, module summaries, known issues, session history — without modifying any files. Token-budgeted: <3K default, <6K with scoped modules, <10K with `--focus all`.
 
 ### Development Lifecycle
 
@@ -117,7 +128,8 @@ Each mode works independently — you don't need the full lifecycle to use any s
 
 ```
 docs-vault/
-├── _state/analysis.json        # Incremental contract (modules, deps, issues)
+├── _state/
+│   └── analysis.json           # State: modules, deps, issues, session history
 ├── Architecture/
 │   ├── System Overview.md      # Mermaid diagrams + narrative
 │   ├── Dependency Map.md       # Cross-module dependencies
@@ -134,34 +146,56 @@ docs-vault/
 └── Index.md                    # Dataview queries
 ```
 
+The `_state/analysis.json` file tracks:
+- Module list and dependency graph
+- Files analyzed with hashes (for change detection)
+- Git commit hash and timestamp (for `--update` diffs)
+- Issues array with open/resolved status (for health tracking across runs)
+- Sessions array logging every generate/update/digest event
+
 ## How It Works
 
-### Phase 1: Analysis (two-pass)
+### Generate (quick/full)
 
+**Phase 1 — Analysis (two-pass):**
 1. Surveys the codebase — entry points, config files, directory structure
 2. Identifies independent modules
 3. **Pass 1** — dispatches parallel **Haiku** agents to extract structure (architecture, API, patterns, dependencies, complexity, key files)
 4. **Pass 2** — dispatches **Sonnet/Opus** agents to identify limitations and improvements, receiving the Haiku output as input (no re-reading code)
 5. Synthesizes into dependency graph, architecture narrative, and aggregated issues
 
-### Phase 2: Generation (parallel)
-
-Dispatches independent agents in parallel with model tier matched to task:
-
+**Phase 2 — Generation (parallel):**
 - **Sonnet** agents: module docs (one per module), System Overview, health reports, full-mode extras
 - **Haiku** agents: Canvas, Dependency Map, Index, state file, Health Summary charts
 
-### Phase 3: Verification
-
+**Phase 3 — Verification:**
 - **Haiku** agent checks all wikilinks resolve and all files have complete frontmatter
-- Reports: file count, module count, mode, broken links
+
+### Update (`--update`)
+
+1. Reads `_state/analysis.json` from existing vault
+2. Runs `git diff <stored_commit>..HEAD` to identify changed files
+3. Maps changed files to affected modules
+4. Auto-selects quick or full based on change scope
+5. Re-analyzes only affected modules (two-pass, same as generate)
+6. Merges new results with existing vault — unchanged module docs preserved
+7. Updates state file with new commit, merged issues, session entry
+8. Runs full verification across the entire vault
+
+### Digest (`--digest`)
+
+1. Validates vault exists with `_state/analysis.json`
+2. Loads architecture overview and module map (always)
+3. Loads additional content based on `--focus` (issues, architecture, or all)
+4. Loads full docs for `--scope` modules, overview-only for the rest
+5. Presents structured context summary to the conversation
 
 ## Skill Files
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Entry point — all modes (generate/update/digest), model tier rules, red flags |
-| `analysis-guide.md` | Phase 1 reference — two-pass agents, model selection, synthesis, incremental update flow |
+| `SKILL.md` | Entry point — all modes (generate/update/digest), model tier rules, lifecycle, red flags |
+| `analysis-guide.md` | Phase 1 reference — two-pass agent templates, model selection, synthesis, incremental update flow |
 | `obsidian-templates.md` | Phase 2 reference — frontmatter schema, audience levels, health templates, callouts, Mermaid |
 | `output-structure.md` | Phase 2 reference — vault layout, generation model assignments, Canvas rules, state file schema |
 
@@ -169,7 +203,7 @@ Dispatches independent agents in parallel with model tier matched to task:
 
 The `examples/` directory contains complete output vaults you can open directly in Obsidian:
 
-- **dockhand/** — full-mode vault from a SvelteKit + Go container management UI (10 modules, patterns, onboarding, cross-cutting concerns)
+- **dockhand/** — full-mode vault from a SvelteKit + Go container management UI (10 modules, 4 patterns, onboarding guides, 3 cross-cutting concerns, health assessment with limitations and code review)
 
 ## Pressure Tests
 
