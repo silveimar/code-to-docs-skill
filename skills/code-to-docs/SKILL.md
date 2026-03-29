@@ -23,6 +23,22 @@ Skill(skill: "code-to-docs", args: "<path> [--mode quick|full] [--output <path>]
 
 ---
 
+## Model Tiers
+
+This skill uses three model tiers to balance cost and quality. Select tier based on the task's cognitive demand.
+
+| Tier | Model | Use For |
+|------|-------|---------|
+| **Extract** | Haiku | Code extraction, mechanical generation, data transforms, verification |
+| **Write** | Sonnet | Narrative writing, pedagogical content, health report assembly |
+| **Reason** | Opus | Issue identification, cross-module synthesis, architectural judgment |
+
+**Conditional escalation:** Use Opus for cross-module synthesis only when the codebase has 5+ modules or the dependency graph contains cycles or bidirectional dependencies. For simpler codebases (1-4 modules, tree-shaped dependencies), Sonnet handles synthesis adequately.
+
+**Conditional escalation for issues:** Use Opus for Limitations & Improvements analysis when a module's complexity is rated High, or when the module exceeds 1000 LOC, or when it involves concurrency or shared mutable state. Use Sonnet for Low/Medium complexity modules.
+
+---
+
 ## Execution
 
 ### Phase 1: Intake & Analysis
@@ -31,26 +47,28 @@ Read `analysis-guide.md` for detailed instructions.
 
 1. Survey the codebase — entry points, config files, directory structure
 2. Identify independent modules
-3. Dispatch parallel agents (MUST parallelize if 3+ modules)
-4. Synthesize into dependency graph and architecture narrative
-5. Write `_state/analysis.json`
+3. Dispatch parallel analysis agents (MUST parallelize if 3+ modules):
+   - **Haiku agents** extract sections 1-6 (architecture, API, patterns, dependencies, complexity, key files)
+   - **Sonnet or Opus agents** then produce section 7 (limitations & improvements), receiving the Haiku output as input. Use Opus for High complexity or >1000 LOC modules; Sonnet otherwise.
+4. Synthesize into dependency graph and architecture narrative — orchestrator for ≤4 modules, **Opus agent** for 5+ modules or complex dependency graphs
+5. Write `_state/analysis.json` (Haiku agent — mechanical data transform)
 
 ### Phase 2: Documentation Generation
 
 Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` for vault layout.
 
-1. Generate `Architecture/` docs with Mermaid diagrams
-2. Generate `Architecture/System Map.canvas`
-3. Generate `Modules/{Name}.md` for each module (include Code Review Notes in Advanced section when issues exist)
-4. Generate `Health/` — Limitations, Code Review, Health Summary with severity charts
-5. (Full mode) Generate `Patterns/`, `Onboarding/`, `Cross-Cutting/`
-6. Generate `Index.md` with Dataview queries
+Dispatch in parallel where possible:
+
+1. **Sonnet agent**: `Architecture/System Overview.md` (narrative writing)
+2. **Haiku agents** (parallel): `Architecture/System Map.canvas`, `Architecture/Dependency Map.md`, `Index.md` (data transforms)
+3. **Sonnet agents** (parallel, one per module): `Modules/{Name}.md` — each receives its module's analysis report + synthesis context
+4. **Sonnet agent**: `Health/` — Limitations.md, Code Review.md, Health Summary.md with severity charts
+5. (Full mode) **Sonnet agents**: `Patterns/`, `Onboarding/`, `Cross-Cutting/`
 
 ### Phase 3: Verification & Output
 
-1. Verify every `[[wikilink]]` resolves to an existing generated file
-2. Verify every file has complete frontmatter
-3. Report: file count, module count, mode, broken links
+1. **Haiku agent**: Verify every `[[wikilink]]` resolves to an existing generated file, verify every file has complete frontmatter
+2. Report: file count, module count, mode, broken links (if any)
 
 ---
 
@@ -64,6 +82,8 @@ Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` fo
 6. Documenting third-party dependencies instead of project code
 7. Fabricating design rationale — say "Rationale not documented" instead
 8. Fabricating code issues — only report limitations/bugs/improvements that are evidently present in the code
+9. Using Opus for extraction or mechanical tasks — Haiku handles these; Opus is reserved for issue analysis on complex modules and cross-module synthesis on large codebases
+10. Issue analysis agents re-reading entire modules — they receive the Haiku report as input and should only read source files to verify specific concerns
 
 ---
 
@@ -78,3 +98,5 @@ Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` fo
 | "I'll just read the whole file, it's not that big" | If it's over 500 lines, grep first. No exceptions. |
 | "This code is fine, no issues to report" | Every codebase has limitations. If you found none, you didn't look hard enough — re-examine error handling, concurrency, and abstraction boundaries. |
 | "I'll skip the code examples in the review" | Before/after snippets are the core educational value. Always include them for bugs and improvements. |
+| "I'll use Opus for everything to be safe" | Opus costs 10-15x more than Haiku. Use the cheapest model that meets the task's cognitive demand. Check the model selection tables. |
+| "This module is simple, I'll skip Pass 2" | Every module gets an issue analysis pass. Simple modules get Sonnet; the pass may report "None identified" — that's a valid outcome. |

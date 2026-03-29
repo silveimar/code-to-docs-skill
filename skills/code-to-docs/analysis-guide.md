@@ -64,14 +64,20 @@ A **module** is an independent subsystem that can be understood without reading 
 
 For 1–2 modules, analyze sequentially in the current session.
 
-For 3+ modules, spawn one Agent per module. Use the following prompt template verbatim, substituting the bracketed placeholders for each module.
+For 3+ modules, analysis is a two-pass process per module. Both passes dispatch in parallel across modules.
 
 ---
 
-#### Agent Prompt Template
+#### Pass 1: Extraction (Haiku agents)
+
+Dispatch one **Haiku** agent per module. These agents extract structured facts from the code — no judgment about quality or issues.
+
+**Haiku Agent Prompt Template:**
 
 ```
-You are analyzing a single module of a larger codebase. Your job is to produce a structured analysis report. Do not read files outside this module's root path unless they define types or interfaces this module directly imports.
+You are extracting structured information from a single module of a codebase. Your job is to read the code and report facts. Do not evaluate code quality or suggest improvements — only extract what is there.
+
+Do not read files outside this module's root path unless they define types or interfaces this module directly imports.
 
 ## Module Details
 
@@ -95,7 +101,7 @@ Work in this order:
 
 ## Required Output Format
 
-Return exactly the following seven sections. Do not add extra sections or omit any. Use the exact headings shown.
+Return exactly the following six sections. Do not add extra sections or omit any. Use the exact headings shown.
 
 ### Architecture
 Describe the internal structure of this module. What is the top-level design pattern (MVC, service/repository, functional pipeline, actor model, etc.)? How are files organized within the module? Where does control flow enter and exit?
@@ -119,9 +125,59 @@ Provide a one-paragraph justification. Identify the single most complex file or 
 
 ### Key Files
 List the 3–7 files most important to understanding this module. For each, provide the path and a one-sentence description of its role.
+```
+
+---
+
+#### Pass 2: Issue Analysis (Sonnet or Opus agents)
+
+After Pass 1 completes, dispatch one agent per module to produce the Limitations & Improvements section. These agents receive the Haiku extraction report as input — they do NOT re-read the code files unless they need to verify a specific concern.
+
+**Model selection for Pass 2:**
+
+| Condition | Model |
+|-----------|-------|
+| Module complexity is **High** | Opus |
+| Module exceeds **1000 LOC** | Opus |
+| Module involves concurrency, shared mutable state, or security-sensitive logic | Opus |
+| Module complexity is **Low** or **Medium** and none of the above apply | Sonnet |
+
+The complexity rating comes from the Haiku agent's Complexity section. If the Haiku report flags concurrency, thread safety, or async/sync bridging in the Architecture or Internal Patterns sections, escalate to Opus regardless of complexity rating.
+
+**Issue Analysis Agent Prompt Template:**
+
+```
+You are reviewing a module for limitations, bugs, risks, and improvement opportunities. You have already received a structured extraction report — use it as your primary source. Only read source files directly if you need to verify a specific concern.
+
+## Module Details
+
+- **Name:** [MODULE_NAME]
+- **Root path:** [MODULE_ROOT_PATH]
+- **Language:** [LANGUAGE]
+
+## Extraction Report (from prior analysis)
+
+[PASTE THE FULL HAIKU EXTRACTION REPORT HERE]
+
+## Instructions
+
+Based on the extraction report above:
+
+1. Review the Architecture section for design constraints, missing abstraction boundaries, and scalability bottlenecks.
+2. Review the Public API section for inconsistent interfaces, missing error types, or unclear contracts.
+3. Review the Internal Patterns section for anti-patterns, deviations from conventions, or fragile implementations.
+4. Review the Complexity section — if a specific file or function was flagged, read it directly (Grep first if >500 lines) to assess whether the complexity is warranted or indicates a problem.
+5. If the extraction report mentions concurrency, async/sync bridging, shared state, or security-sensitive operations, read the relevant code sections to assess race conditions, deadlock potential, and data integrity risks.
+
+Only read source files when verifying a specific concern identified from the report. Do not re-read the entire module.
+
+## Required Output Format
+
+Return exactly one section:
 
 ### Limitations & Improvements
-Identify concrete issues in this module. For each, classify as one of:
+
+For each issue, classify as one of:
 - **Limitation** — architectural or design constraint that restricts what the module can do (e.g., single-threaded, no retry logic, hard-coded config, missing abstraction boundary)
 - **Bug or Risk** — code that is incorrect, fragile, or likely to fail under specific conditions (e.g., unhandled exception path, race condition, missing null check)
 - **Improvement Opportunity** — code that works but could be better (e.g., duplicated logic that should be extracted, overly complex function that should be split, missing error context, inconsistent naming)
@@ -133,9 +189,19 @@ For each item provide: the file path and line range, a description of the issue,
 
 ### Step 4: Synthesis
 
-After all agents return (or after sequential analysis completes):
+After all Pass 1 and Pass 2 agents return (or after sequential analysis completes), combine their outputs into a unified report per module (sections 1-7), then synthesize across modules.
 
-1. **Collect all reports** — verify all seven sections are present in each report; flag missing sections before proceeding.
+**Model selection for synthesis:**
+
+| Condition | Approach |
+|-----------|----------|
+| ≤4 modules with tree-shaped dependencies (no cycles, no bidirectional) | Orchestrator performs synthesis directly (Sonnet-level) |
+| 5+ modules | Dispatch an **Opus agent** for synthesis — it receives all module reports as input |
+| Any number of modules with cycles or bidirectional dependencies | Dispatch an **Opus agent** — complex dependency reasoning needed |
+
+**Synthesis steps:**
+
+1. **Collect all reports** — verify all seven sections are present in each module's combined report (6 from Haiku + 1 from Sonnet/Opus); flag missing sections before proceeding.
 2. **Build the cross-module dependency graph** — for each module, list what it depends on; identify cycles or bidirectional dependencies.
 3. **Identify system-wide patterns** — patterns that appear in 3+ modules are architectural conventions worth documenting at the top level.
 4. **Resolve naming consistency** — standardize module names across reports if agents used different labels for the same module.
@@ -143,7 +209,7 @@ After all agents return (or after sequential analysis completes):
 6. **Generate the top-level architecture narrative** — a 3–5 paragraph description of the system that a new engineer could read to understand how the pieces fit together.
 7. **Aggregate limitations and improvements** — collect all issues from agent reports, deduplicate, identify system-wide themes (e.g., "no error handling strategy across 4 modules"), and rank by severity. This feeds the Health/ directory in Phase 2.
 
-**Write synthesis output to `_state/analysis.json`** with the following top-level keys:
+**Write `_state/analysis.json`** — dispatch a **Haiku agent** for this mechanical data transform. Provide the synthesis output and let it assemble the JSON. Schema:
 
 ```json
 {
@@ -166,17 +232,17 @@ See `output-structure.md` for the full schema description and incremental contra
 
 ## Agent Output Schema
 
-All seven sections are required. An agent report missing any section must be re-requested before synthesis begins.
+All seven sections are required per module. Sections 1-6 come from the Haiku extraction agent; section 7 comes from the Sonnet/Opus issue analysis agent. Combine into one report per module before synthesis.
 
-| Section | Required | Content |
-|---|---|---|
-| **Architecture** | Yes | Internal design pattern, file organization, control flow entry and exit points |
-| **Public API** | Yes | All exported symbols consumed externally: function signatures, class public methods, exported types, HTTP routes or event names |
-| **Internal Patterns** | Yes | Implementation patterns not visible from outside: caching, retry logic, internal buses, factories, singletons |
-| **Dependencies** | Yes | Two groups: (1) other project modules with specific imports, (2) third-party packages with version and purpose |
-| **Complexity** | Yes | Rating (Low/Medium/High) with one-paragraph justification and identification of the single most complex file or function |
-| **Key Files** | Yes | 3–7 files most important to understanding the module, each with path and one-sentence role description |
-| **Limitations & Improvements** | Yes | Classified issues (limitation/bug-risk/improvement) with file path, severity, and suggested fix. "None identified" if the module is clean. |
+| Section | Source | Model | Content |
+|---|---|---|---|
+| **Architecture** | Pass 1 | Haiku | Internal design pattern, file organization, control flow entry and exit points |
+| **Public API** | Pass 1 | Haiku | All exported symbols consumed externally: function signatures, class public methods, exported types, HTTP routes or event names |
+| **Internal Patterns** | Pass 1 | Haiku | Implementation patterns not visible from outside: caching, retry logic, internal buses, factories, singletons |
+| **Dependencies** | Pass 1 | Haiku | Two groups: (1) other project modules with specific imports, (2) third-party packages with version and purpose |
+| **Complexity** | Pass 1 | Haiku | Rating (Low/Medium/High) with one-paragraph justification and identification of the single most complex file or function |
+| **Key Files** | Pass 1 | Haiku | 3–7 files most important to understanding the module, each with path and one-sentence role description |
+| **Limitations & Improvements** | Pass 2 | Sonnet or Opus | Classified issues (limitation/bug-risk/improvement) with file path, severity, and suggested fix. "None identified" if the module is clean. |
 
 ---
 
@@ -215,8 +281,14 @@ These rules apply to all agents and to the orchestrating session.
 
 1. **Grep before Read** — never read a file larger than 500 lines without first using Grep to locate the specific symbols or sections needed. Reading a large file in full when only 20 lines are relevant wastes context and slows synthesis.
 
-2. **One agent per module** — do not spawn multiple agents for a single module, and do not merge two modules into one agent. Each module gets exactly one agent with exactly one analysis report.
+2. **One extraction agent per module** — do not spawn multiple Haiku agents for a single module. The issue analysis agent (Pass 2) is a separate, second agent for the same module — this is the intended two-pass design, not a violation.
 
 3. **Suppress verbose output** — agents must not quote large blocks of source code in their reports. Reports describe and summarize; they include code-fenced signatures only in the Public API section, and only the signature line (not the full implementation).
 
 4. **Skip dependency internals** — document only the project's own code. Do not trace into `node_modules`, `vendor`, or any third-party package source. External packages are recorded by name, version, and purpose only.
+
+5. **Use the cheapest sufficient model** — Haiku for extraction and mechanical tasks, Sonnet for writing and standard issue analysis, Opus only when escalation conditions are met (see Step 3 and Step 4 model selection tables). Do not use Opus "just to be safe" — it costs 10-15x more than Haiku per token.
+
+6. **Pass 2 agents receive reports, not code** — issue analysis agents should work primarily from the Haiku extraction report. Only read source files to verify a specific concern. This avoids re-reading the entire module at a higher-cost model tier.
+
+7. **Parallel generation in Phase 2** — module docs, mechanical files (Canvas, Index, Dependency Map, state file), and health reports are independent outputs. Dispatch them in parallel to keep each agent's context small and focused.

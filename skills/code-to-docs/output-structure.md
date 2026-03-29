@@ -6,6 +6,26 @@ Supporting reference for the `code-to-docs` skill. Loaded on demand during Phase
 
 ---
 
+## Phase 2 Generation Model Assignments
+
+Dispatch these as parallel agents where possible. Each agent receives only the data it needs — not the full synthesis.
+
+| Output | Model | Input | Notes |
+|--------|-------|-------|-------|
+| `Architecture/System Overview.md` | **Sonnet** | Synthesis narrative + dependency graph | Narrative architecture writing |
+| `Architecture/Dependency Map.md` | **Haiku** | Dependency graph from synthesis | Data → Mermaid + table transform |
+| `Architecture/System Map.canvas` | **Haiku** | Module list + dependency graph | Data → JSON Canvas transform |
+| `Modules/{Name}.md` (×N) | **Sonnet** | That module's 7-section report + synthesis context for wikilinks | One agent per module, parallel |
+| `Health/Health Summary.md` | **Haiku** | Aggregated issue counts | Data → Mermaid chart transform |
+| `Health/Limitations.md` + `Health/Code Review.md` | **Sonnet** | Aggregated issues from synthesis | Requires judgment for framing |
+| `Patterns/{Name}.md` (full mode) | **Sonnet** | System-wide patterns from synthesis | Pattern identification + writing |
+| `Onboarding/` (full mode) | **Sonnet** | Full synthesis + module reports | Requires broad codebase understanding |
+| `Cross-Cutting/{Name}.md` (full mode) | **Sonnet** | Relevant cross-cutting data from synthesis | Requires cross-module reasoning |
+| `Index.md` | **Haiku** | Project name + timestamp + mode | Template fill |
+| `_state/analysis.json` | **Haiku** | Synthesis data | Mechanical JSON assembly |
+
+---
+
 ## Vault Directory Layout
 
 ```
