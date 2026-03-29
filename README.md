@@ -104,6 +104,31 @@ Loads existing vault context into the conversation — architecture, module summ
 
 The three modes form an optional workflow:
 
+```mermaid
+flowchart LR
+    subgraph Session Start
+        D["/code-to-docs --digest"]
+    end
+
+    subgraph Development
+        C["Coding Work"]
+    end
+
+    subgraph Session End
+        U["/code-to-docs --update"]
+    end
+
+    V["docs-vault/"] -->|"read context\n(read-only)"| D
+    D -->|"architecture, modules,\nknown issues"| C
+    C -->|"git diff\nchanged files"| U
+    U -->|"re-analyze affected\nmodules only"| V
+
+    style D fill:#4a9eff,color:#fff
+    style C fill:#2d2d2d,color:#fff
+    style U fill:#ff6b35,color:#fff
+    style V fill:#7c3aed,color:#fff
+```
+
 ```
 Session start:  /code-to-docs --digest ./docs-vault --scope {modules you'll touch}
 Coding work:    ... normal development ...
