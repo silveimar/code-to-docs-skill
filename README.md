@@ -57,11 +57,14 @@ Add this repo as a marketplace source, then install the plugin:
 Copy the skill files directly:
 
 ```bash
-mkdir -p ~/.claude/skills/code-to-docs
+mkdir -p ~/.claude/skills/code-to-docs ~/.claude/skills/code-to-docs-digest
 cp skills/code-to-docs/* ~/.claude/skills/code-to-docs/
+cp skills/code-to-docs-digest/* ~/.claude/skills/code-to-docs-digest/
 ```
 
 ## Usage
+
+### Generate Documentation
 
 ```
 /code-to-docs /path/to/codebase
@@ -69,19 +72,54 @@ cp skills/code-to-docs/* ~/.claude/skills/code-to-docs/
 /code-to-docs /path/to/codebase --mode quick --output ./my-docs/
 ```
 
-Or invoke programmatically:
+### Incremental Update (after coding)
 
 ```
-Skill(skill: "code-to-docs", args: "/path/to/codebase --mode quick")
+/code-to-docs /path/to/codebase --update
 ```
+
+Auto-selects quick or full based on the scope of changes since the last run. Only re-analyzes affected modules.
+
+### Digest Context (before coding)
+
+```
+/code-to-docs-digest ./docs-vault
+/code-to-docs-digest ./docs-vault --scope Auth,Database --focus issues
+/code-to-docs-digest ./docs-vault --focus all
+```
+
+Loads existing vault context into the conversation — architecture, module summaries, known issues — without modifying any files.
+
+### Development Lifecycle
+
+The three components form an optional workflow:
+
+```
+Session start:  /code-to-docs-digest ./docs-vault --scope {modules you'll touch}
+Coding work:    ... normal development ...
+Session end:    /code-to-docs /path/to/codebase --update
+```
+
+Each works independently — you don't need the full lifecycle to use any single component.
 
 ### Arguments
+
+**code-to-docs:**
 
 | Argument | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `<path>` | Yes | — | Root of the codebase to document |
-| `--mode` | No | `quick` | `quick` or `full` |
+| `--mode` | No | `quick` | `quick` or `full` (ignored with `--update`) |
+| `--update` | No | — | Incremental update from existing vault state |
 | `--output` | No | `./docs-vault/` | Output path (relative to codebase root) |
+
+**code-to-docs-digest:**
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `<vault-path>` | Yes | — | Path to existing docs-vault directory |
+| `--scope` | No | all (overview only) | Comma-separated module names to load in full |
+| `--focus` | No | `architecture` | `architecture`, `issues`, or `all` |
 
 ## Output Structure
 
@@ -128,12 +166,20 @@ Dispatches independent agents in parallel with model tier matched to task:
 
 ## Skill Files
 
+**code-to-docs** (generator + updater):
+
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Entry point — orchestrates phases, model tier rules, red flags, discipline |
-| `analysis-guide.md` | Phase 1 reference — two-pass agent templates, model selection tables, synthesis |
+| `SKILL.md` | Entry point — orchestrates phases, update mode, model tier rules, red flags |
+| `analysis-guide.md` | Phase 1 reference — two-pass agents, model selection, synthesis, incremental update flow |
 | `obsidian-templates.md` | Phase 2 reference — frontmatter schema, audience levels, health templates, callouts, Mermaid |
 | `output-structure.md` | Phase 2 reference — vault layout, generation model assignments, Canvas rules, state file schema |
+
+**code-to-docs-digest** (session-start context loader):
+
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | Read-only vault loader — selective context loading with scope and focus controls |
 
 ## Examples
 
@@ -151,10 +197,10 @@ Three test scenarios in `tests/`:
 
 ## Future Enhancements
 
-- Incremental updates via `git diff` + state file (issues tracked across runs)
 - Configurable output format (portable markdown vs Obsidian-native)
 - Excalidraw diagram generation
 - Integration with `obsidian-cli` skill
+- Hook-based automation (auto-digest on session start, auto-update on commit)
 
 ## License
 

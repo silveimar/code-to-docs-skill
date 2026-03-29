@@ -292,3 +292,111 @@ These rules apply to all agents and to the orchestrating session.
 6. **Pass 2 agents receive reports, not code** — issue analysis agents should work primarily from the Haiku extraction report. Only read source files to verify a specific concern. This avoids re-reading the entire module at a higher-cost model tier.
 
 7. **Parallel generation in Phase 2** — module docs, mechanical files (Canvas, Index, Dependency Map, state file), and health reports are independent outputs. Dispatch them in parallel to keep each agent's context small and focused.
+
+8. **Update mode: only re-analyze changed modules** — unchanged modules keep their existing reports. Do not re-run analysis on a module just because it was loaded into context. The `git diff` output is the sole source of truth for what changed.
+
+---
+
+## Incremental Update Flow
+
+This section applies only when `--update` is passed. For baseline generation (no `--update`), follow Steps 1-4 above.
+
+### Update Step 1: Load Previous State
+
+1. Read `_state/analysis.json` from the existing vault at `--output` path
+2. If the file does not exist, abort update and fall back to a full generate run. Inform the user: "No previous state found — running full generation instead."
+3. Extract: `git_commit` (the commit hash from the last run), `modules` (module list), `dependency_graph`, `files_analyzed`, `issues`
+
+### Update Step 2: Diff
+
+1. Run `git diff <stored_git_commit>..HEAD --name-only` in the codebase root
+2. Filter out excluded paths (see Exclusions section)
+3. The result is the list of **changed files** since the last documentation run
+
+If the diff is empty (no changes since last run), report "No changes since last documentation run" and exit without modifying the vault.
+
+### Update Step 3: Map Changes to Modules
+
+For each changed file, look it up in the `files_analyzed` map to determine which module it belongs to.
+
+Classify the changes:
+
+| Category | Detection | Implication |
+|----------|-----------|-------------|
+| **Modified within existing module** | Changed file found in `files_analyzed` for a known module | Re-analyze that module |
+| **New file in existing module directory** | File path falls within a known module's root path but is not in `files_analyzed` | Re-analyze that module |
+| **New file outside all modules** | File path is not in any known module's root path | Potential new module — triggers full mode |
+| **Deleted file** | File in `files_analyzed` no longer exists on disk | Re-analyze the owning module |
+| **New top-level directory with source files** | New directory at project root containing code files | New module — triggers full mode |
+
+Build the list of **affected modules** — modules that need re-analysis.
+
+### Update Step 4: Auto-Select Mode
+
+| Condition | Mode |
+|-----------|------|
+| All changes within existing modules, no new modules, no deleted modules | **Quick** |
+| New module detected (new directory with source files outside existing module roots) | **Full** |
+| Module deleted (all files in a module removed) | **Full** |
+| Dependency structure changed (new cross-module imports detected in diff) | **Full** |
+| >50% of tracked files in `files_analyzed` changed | **Full** |
+
+Report the auto-selected mode to the user: "Update mode: quick (2 of 8 modules affected)" or "Update mode: full (new module detected: Scheduler)".
+
+### Update Step 5: Re-Analyze Affected Modules
+
+For each affected module, run the same two-pass analysis as baseline:
+
+1. **Haiku extraction** (sections 1-6) — same agent prompt template as Step 3 Pass 1
+2. **Sonnet/Opus issue analysis** (section 7) — same agent prompt template as Step 3 Pass 2, same model escalation rules
+
+For **unchanged modules**, carry forward their existing reports from the previous run. Do not re-analyze.
+
+If auto-selected mode is **full**, also run Step 2 (Module Identification) to detect any new modules, then analyze those as well.
+
+### Update Step 6: Merge Synthesis
+
+Combine new analysis reports (affected modules) with carried-forward reports (unchanged modules) into a single synthesis.
+
+Run the same synthesis procedure as Step 4, but with awareness of what changed:
+
+1. Rebuild dependency graph from all module reports (new + carried forward)
+2. Compare new dependency graph to previous — flag any structural changes
+3. Regenerate architecture narrative (always — even small changes can shift the system story)
+4. Merge issues:
+   - Issues in re-analyzed modules: replace with new analysis results
+   - Issues in unchanged modules: carry forward with status `open`
+   - Issues from previous run that no longer appear in re-analyzed modules: mark as `resolved`
+
+### Update Step 7: Selective Generation
+
+Use the same Phase 2 generation flow, but selectively:
+
+| Output | When to regenerate |
+|--------|-------------------|
+| `Architecture/System Overview.md` | Always (cross-module, cheap to regenerate) |
+| `Architecture/Dependency Map.md` | Always |
+| `Architecture/System Map.canvas` | Always |
+| `Modules/{Name}.md` for affected modules | Always |
+| `Modules/{Name}.md` for unchanged modules | **Never** — preserve existing |
+| `Health/` (all files) | Always (depends on merged issues) |
+| `Patterns/` (full mode) | Only if auto-selected full |
+| `Onboarding/` (full mode) | Only if auto-selected full |
+| `Cross-Cutting/` (full mode) | Only if auto-selected full |
+| `Index.md` | Always (cheap, ensures consistency) |
+| `_state/analysis.json` | Always (must reflect new state) |
+
+### Update Step 8: Update State File
+
+Write `_state/analysis.json` with:
+- `git_commit` → current HEAD
+- `timestamp` → now
+- `mode` → the auto-selected mode
+- `modules` → merged module list (may include new modules in full mode)
+- `files_analyzed` → merged map (updated entries for re-analyzed modules, carried forward for unchanged)
+- `issues` → merged array with status updates
+- `sessions` → append new session entry (see `output-structure.md` for schema)
+
+### Update Step 9: Verify
+
+Same as Phase 3 — Haiku agent checks wikilinks and frontmatter across the entire vault (not just changed files).

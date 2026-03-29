@@ -195,12 +195,44 @@ SORT generated-at DESC
       "file": "relative/path/to/file.ts",
       "lines": "start-end or null",
       "summary": "one-line description",
-      "status": "open"
+      "status": "open | resolved"
+    }
+  ],
+  "sessions": [
+    {
+      "type": "generate | update | digest",
+      "timestamp": "ISO 8601",
+      "git_commit_start": "abc123 or null",
+      "git_commit_end": "def456",
+      "mode": "quick | full | null (for digest)",
+      "modules_affected": ["Module A", "Module B"],
+      "issues_resolved": ["issue-slug-1"],
+      "issues_introduced": ["issue-slug-2"]
     }
   ]
 }
 ```
 
-This is the **incremental contract**. A future incremental mode will read this state, run `git diff` against the stored commit, and re-analyze only changed modules. The `issues` array enables tracking over time — on incremental runs, compare new issues against the previous snapshot to identify what was resolved, what persists, and what was introduced. The baseline skill writes this file but does not consume it — do not skip writing it.
+### State File Fields
+
+**Core fields** — written on every generate or update run:
+- `modules`, `dependency_graph`, `files_analyzed`, `git_commit`, `timestamp`, `mode` — snapshot of the codebase as of this run
+
+**Issues array** — tracks codebase health across runs:
+- On generate: all issues start with `status: "open"`
+- On update: resolved issues change to `status: "resolved"`, new issues added as `"open"`, unchanged module issues carried forward
+
+**Sessions array** — audit trail of the documentation lifecycle:
+- `type: "generate"` — baseline quick or full run
+- `type: "update"` — incremental update via `--update`
+- `type: "digest"` — recorded when `code-to-docs-digest` loads the vault (read-only, no changes to docs)
+- `git_commit_start` — the stored commit from the previous state (null on first generate)
+- `git_commit_end` — HEAD at the time of this session
+- `modules_affected` — which modules were analyzed (all for generate, subset for update, none for digest)
+- `issues_resolved` / `issues_introduced` — what changed in the health picture
+
+The sessions array provides continuity across the digest → code → update lifecycle. The digest skill reads it to report how stale the documentation is and what changed in recent sessions.
+
+This is the **incremental contract**. The `--update` mode reads this state, runs `git diff` against the stored commit, and re-analyzes only changed modules. The `code-to-docs-digest` skill reads it to provide session-start context. The baseline skill writes this file on every run — do not skip writing it.
 
 **Note:** `_state/` is internal to the skill. If the vault is committed to git, add `_state/` to `.gitignore` to avoid leaking file hashes and commit refs from the analyzed codebase.

@@ -11,15 +11,19 @@ Analyze a codebase and produce an Obsidian-native documentation vault containing
 
 ```
 Skill(skill: "code-to-docs", args: "<path> [--mode quick|full] [--output <path>]")
+Skill(skill: "code-to-docs", args: "<path> --update [--output <path>]")
 ```
 
 - `<path>` — codebase root (required)
-- `--mode` — `quick` (default) or `full`
+- `--mode` — `quick` (default) or `full`. Ignored when `--update` is set.
+- `--update` — incremental update: re-analyze only modules with changes since last run
 - `--output` — vault output path (default: `./docs-vault/` relative to codebase)
 
 **Quick mode:** Architecture overview, module inventory, API reference, codebase health assessment, index pages — all at three audience levels.
 
 **Full mode:** Everything in quick, plus design patterns, onboarding guides, cross-cutting concerns, tutorial walkthroughs.
+
+**Update mode:** Reads `_state/analysis.json` from the existing vault, runs `git diff` against the stored commit, re-analyzes only affected modules, and merges results with existing docs. Auto-selects quick or full based on the scope of changes.
 
 ---
 
@@ -69,6 +73,59 @@ Dispatch in parallel where possible:
 
 1. **Haiku agent**: Verify every `[[wikilink]]` resolves to an existing generated file, verify every file has complete frontmatter
 2. Report: file count, module count, mode, broken links (if any)
+
+---
+
+## Update Mode (`--update`)
+
+When `--update` is set, the skill runs an incremental update instead of a full generation. Read `analysis-guide.md` section "Incremental Update Flow" for detailed instructions.
+
+### Prerequisites
+
+- An existing vault with `_state/analysis.json` at the output path
+- The codebase must be a git repository (needed for `git diff`)
+- If either is missing, fall back to a full generate run and inform the user
+
+### Update Phases
+
+1. **Diff** — Read `_state/analysis.json`, run `git diff <stored_commit>..HEAD --name-only` to get changed files
+2. **Map** — Map changed files to affected modules using the `files_analyzed` entries. Files not in any module are flagged for review (possible new module).
+3. **Auto-select mode:**
+   - **Quick** if: changes are within existing modules only, no new top-level directories, dependency graph unchanged
+   - **Full** if: new modules detected, modules removed, dependency structure changed (new imports across module boundaries), or >50% of tracked files changed
+4. **Re-analyze** — Run the two-pass analysis (Haiku extraction → Sonnet/Opus issues) only on affected modules. Unchanged modules keep their existing reports.
+5. **Merge** — Combine new analysis with existing vault docs:
+   - Regenerate changed module docs
+   - Preserve unchanged module docs
+   - Regenerate Architecture/ and Health/ from the merged synthesis (always — these are cross-module)
+   - Regenerate Index.md (always — cheap, ensures consistency)
+6. **Update state** — Write new `_state/analysis.json` with updated commit hash, timestamp, merged issues (mark resolved issues, add new ones), and append to sessions array
+7. **Verify** — Same as Phase 3 of baseline
+
+### Issue Tracking Across Updates
+
+On each update, compare the new issues against the previous `issues` array:
+
+| Scenario | Action |
+|----------|--------|
+| Issue from previous run still present in re-analyzed module | Keep with status `open` |
+| Issue from previous run absent in re-analyzed module | Change status to `resolved` |
+| Issue from previous run in a module that wasn't re-analyzed | Keep with status `open` (unchanged) |
+| New issue found in re-analyzed module | Add with status `open` |
+
+---
+
+## Development Lifecycle
+
+The intended workflow integrates digest, coding, and update:
+
+```
+Session start:  /code-to-docs-digest ./docs-vault --scope {relevant modules}
+Coding work:    ... normal development ...
+Session end:    /code-to-docs /path/to/codebase --update
+```
+
+This lifecycle is optional — each component works independently. The generate modes (`quick`/`full`) work without a prior vault. The digest skill works without an upcoming update. The update mode works without a prior digest.
 
 ---
 
