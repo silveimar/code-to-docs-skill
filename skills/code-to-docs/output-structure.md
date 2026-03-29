@@ -26,6 +26,10 @@ docs-vault/
 │   └── Debugging Guide.md
 ├── Cross-Cutting/              # full mode only
 │   └── {Concern Name}.md
+├── Health/
+│   ├── Limitations.md          # Architecture and component constraints
+│   ├── Code Review.md          # Bugs, risks, and improvement opportunities
+│   └── Health Summary.md       # Aggregate charts and severity breakdown
 └── Index.md                    # Hub page with Dataview queries
 ```
 
@@ -126,6 +130,14 @@ WHERE status != "generated"
 SORT file.name ASC
 \`\`\`
 
+## Codebase Health
+
+\`\`\`dataview
+TABLE title, type, status
+FROM #code-docs AND #health
+SORT title ASC
+\`\`\`
+
 ## All Documentation
 
 \`\`\`dataview
@@ -153,10 +165,22 @@ SORT generated-at DESC
   },
   "git_commit": "abc123 or null if not a git repo",
   "timestamp": "ISO 8601",
-  "mode": "quick | full"
+  "mode": "quick | full",
+  "issues": [
+    {
+      "id": "unique-slug",
+      "module": "Module Name",
+      "type": "limitation | bug-risk | improvement",
+      "severity": "low | medium | high",
+      "file": "relative/path/to/file.ts",
+      "lines": "start-end or null",
+      "summary": "one-line description",
+      "status": "open"
+    }
+  ]
 }
 ```
 
-This is the **incremental contract**. A future incremental mode will read this state, run `git diff` against the stored commit, and re-analyze only changed modules. The baseline skill writes this file but does not consume it — do not skip writing it.
+This is the **incremental contract**. A future incremental mode will read this state, run `git diff` against the stored commit, and re-analyze only changed modules. The `issues` array enables tracking over time — on incremental runs, compare new issues against the previous snapshot to identify what was resolved, what persists, and what was introduced. The baseline skill writes this file but does not consume it — do not skip writing it.
 
 **Note:** `_state/` is internal to the skill. If the vault is committed to git, add `_state/` to `.gitignore` to avoid leaking file hashes and commit refs from the analyzed codebase.

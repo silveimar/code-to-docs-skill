@@ -11,7 +11,7 @@ Every generated file MUST include this frontmatter block as the very first thing
 ```yaml
 ---
 title: string
-type: module | architecture | pattern | onboarding | cross-cutting | index
+type: module | architecture | pattern | onboarding | cross-cutting | health | index
 language:
   - string
 status: generated
@@ -36,7 +36,7 @@ tags:
 Plain string. Use the module or concept name as it appears in the codebase — do not invent a display name.
 
 **`type`**
-One of: `module`, `architecture`, `pattern`, `onboarding`, `cross-cutting`, `index`. Must match the `{type}` tag entry.
+One of: `module`, `architecture`, `pattern`, `onboarding`, `cross-cutting`, `health`, `index`. Must match the `{type}` tag entry.
 
 **`language`**
 Always a YAML list, even for a single language. Write `["typescript"]`, never `"typescript"`. Multiple languages are common for projects with both runtime and config layers.
@@ -308,6 +308,119 @@ sequenceDiagram
 
 ---
 
-## 6. Dataview Queries
+## 6. Health Report Templates
+
+The `Health/` directory contains three files that assess codebase quality. These are generated in both quick and full modes.
+
+### Health Summary.md
+
+The hub page for codebase health. Contains:
+
+1. **Severity breakdown** — Mermaid pie chart showing issue distribution by severity
+
+```mermaid
+pie title Issues by Severity
+    "High" : 3
+    "Medium" : 7
+    "Low" : 4
+```
+
+2. **Issues by type** — Mermaid bar chart
+
+```mermaid
+xychart-beta
+    title "Issues by Type"
+    x-axis ["Limitations", "Bugs/Risks", "Improvements"]
+    y-axis "Count" 0 --> 10
+    bar [4, 3, 7]
+```
+
+3. **Issues by module** — Mermaid bar chart showing which modules carry the most issues
+4. **Summary table** — Dataview query pulling from `#health` tagged files
+
+### Limitations.md
+
+Documents architecture and design constraints. Each limitation is a section:
+
+```markdown
+### {Limitation Title}
+
+**Module:** [[{Module Name}]]
+**Severity:** {high|medium|low}
+**File:** `{relative/path}:{line range}`
+
+{Description of the constraint — what it prevents, why it exists, what would need to change to remove it.}
+
+> [!warning] Impact
+> {Concrete consequences of this limitation for users or developers.}
+
+> [!tip] Possible Approach
+> {If a mitigation or resolution path is inferable, describe it. If not, state "No clear resolution path from current code."}
+```
+
+### Code Review.md
+
+Documents bugs, risks, and improvement opportunities. Each item is a section:
+
+```markdown
+### {Issue Title}
+
+**Module:** [[{Module Name}]]
+**Type:** {bug-risk|improvement}
+**Severity:** {high|medium|low}
+**File:** `{relative/path}:{line range}`
+
+{Description of the issue.}
+
+> [!danger] Why This Matters
+> {For bugs/risks: what can go wrong, under what conditions.}
+
+> [!example] Current Code
+> ```{language}
+> {The problematic code snippet — keep short, just enough to show the issue.}
+> ```
+
+> [!tip] Suggested Improvement
+> ```{language}
+> {How the code could be improved. Include the fix or refactored version.}
+> ```
+> {Brief explanation of why this is better.}
+```
+
+The before/after code comparison is the core educational value — readers learn by seeing what's wrong and what better looks like. Only include a suggested improvement when the fix is clear and defensible. For ambiguous cases, describe the trade-offs instead.
+
+## 7. Educational Review Callouts in Module Docs
+
+Within the **Advanced** section of each module doc, add a `### Code Review Notes` subsection when the agent identified issues for that module. This keeps educational content close to the code it references.
+
+```markdown
+### Code Review Notes
+
+> [!warning] {Issue title}
+> **File:** `{path}:{lines}` | **Severity:** {level}
+>
+> {Description of the issue and why it matters.}
+>
+> **Current approach:**
+> ```{language}
+> {problematic snippet}
+> ```
+>
+> **Better approach:**
+> ```{language}
+> {improved snippet}
+> ```
+> {Why this is better — the educational explanation.}
+```
+
+Rules:
+- Only include review notes when agents identified real issues. Do not fabricate issues to fill this section.
+- Link each note to the corresponding entry in `[[Code Review]]` or `[[Limitations]]` for full context.
+- Keep snippets minimal — just enough to show the issue and fix, not the entire function.
+- The tone is educational, not judgmental. Frame issues as learning opportunities.
+
+---
+
+## 8. Dataview Queries
 
 Dataview query templates for Index.md are defined in `output-structure.md` (Index.md Template section). The queries depend on the frontmatter fields and tags defined in Section 1 above — specifically `title`, `language`, `complexity`, `status`, `type`, and `generated-at`, plus the `#code-docs` and `#{type}` tags.

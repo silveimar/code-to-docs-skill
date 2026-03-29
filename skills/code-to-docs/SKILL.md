@@ -17,7 +17,7 @@ Skill(skill: "code-to-docs", args: "<path> [--mode quick|full] [--output <path>]
 - `--mode` — `quick` (default) or `full`
 - `--output` — vault output path (default: `./docs-vault/` relative to codebase)
 
-**Quick mode:** Architecture overview, module inventory, API reference, index pages — all at three audience levels.
+**Quick mode:** Architecture overview, module inventory, API reference, codebase health assessment, index pages — all at three audience levels.
 
 **Full mode:** Everything in quick, plus design patterns, onboarding guides, cross-cutting concerns, tutorial walkthroughs.
 
@@ -41,9 +41,10 @@ Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` fo
 
 1. Generate `Architecture/` docs with Mermaid diagrams
 2. Generate `Architecture/System Map.canvas`
-3. Generate `Modules/{Name}.md` for each module
-4. (Full mode) Generate `Patterns/`, `Onboarding/`, `Cross-Cutting/`
-5. Generate `Index.md` with Dataview queries
+3. Generate `Modules/{Name}.md` for each module (include Code Review Notes in Advanced section when issues exist)
+4. Generate `Health/` — Limitations, Code Review, Health Summary with severity charts
+5. (Full mode) Generate `Patterns/`, `Onboarding/`, `Cross-Cutting/`
+6. Generate `Index.md` with Dataview queries
 
 ### Phase 3: Verification & Output
 
@@ -62,6 +63,7 @@ Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` fo
 5. Skipping wikilink verification in Phase 3
 6. Documenting third-party dependencies instead of project code
 7. Fabricating design rationale — say "Rationale not documented" instead
+8. Fabricating code issues — only report limitations/bugs/improvements that are evidently present in the code
 
 ---
 
@@ -74,3 +76,5 @@ Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` fo
 | "The advanced section is the same as intermediate" | You missed edge cases, concurrency, or failure modes. Re-analyze. |
 | "This module is too simple for three levels" | Beginner still explains language constructs. Advanced still covers failure modes. Write all three. |
 | "I'll just read the whole file, it's not that big" | If it's over 500 lines, grep first. No exceptions. |
+| "This code is fine, no issues to report" | Every codebase has limitations. If you found none, you didn't look hard enough — re-examine error handling, concurrency, and abstraction boundaries. |
+| "I'll skip the code examples in the review" | Before/after snippets are the core educational value. Always include them for bugs and improvements. |

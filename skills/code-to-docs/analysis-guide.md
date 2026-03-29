@@ -95,7 +95,7 @@ Work in this order:
 
 ## Required Output Format
 
-Return exactly the following six sections. Do not add extra sections or omit any. Use the exact headings shown.
+Return exactly the following seven sections. Do not add extra sections or omit any. Use the exact headings shown.
 
 ### Architecture
 Describe the internal structure of this module. What is the top-level design pattern (MVC, service/repository, functional pipeline, actor model, etc.)? How are files organized within the module? Where does control flow enter and exit?
@@ -119,6 +119,14 @@ Provide a one-paragraph justification. Identify the single most complex file or 
 
 ### Key Files
 List the 3–7 files most important to understanding this module. For each, provide the path and a one-sentence description of its role.
+
+### Limitations & Improvements
+Identify concrete issues in this module. For each, classify as one of:
+- **Limitation** — architectural or design constraint that restricts what the module can do (e.g., single-threaded, no retry logic, hard-coded config, missing abstraction boundary)
+- **Bug or Risk** — code that is incorrect, fragile, or likely to fail under specific conditions (e.g., unhandled exception path, race condition, missing null check)
+- **Improvement Opportunity** — code that works but could be better (e.g., duplicated logic that should be extracted, overly complex function that should be split, missing error context, inconsistent naming)
+
+For each item provide: the file path and line range, a description of the issue, the severity (low/medium/high), and a suggested fix or approach. Do not fabricate issues — only report what is evidently present in the code. If the module is well-written with no notable issues, state that explicitly.
 ```
 
 ---
@@ -127,12 +135,13 @@ List the 3–7 files most important to understanding this module. For each, prov
 
 After all agents return (or after sequential analysis completes):
 
-1. **Collect all reports** — verify all six sections are present in each report; flag missing sections before proceeding.
+1. **Collect all reports** — verify all seven sections are present in each report; flag missing sections before proceeding.
 2. **Build the cross-module dependency graph** — for each module, list what it depends on; identify cycles or bidirectional dependencies.
 3. **Identify system-wide patterns** — patterns that appear in 3+ modules are architectural conventions worth documenting at the top level.
 4. **Resolve naming consistency** — standardize module names across reports if agents used different labels for the same module.
 5. **Determine architecture type** — classify the system as one of: monolith, microservices, modular monolith, plugin-based, or hybrid. Justify the classification.
 6. **Generate the top-level architecture narrative** — a 3–5 paragraph description of the system that a new engineer could read to understand how the pieces fit together.
+7. **Aggregate limitations and improvements** — collect all issues from agent reports, deduplicate, identify system-wide themes (e.g., "no error handling strategy across 4 modules"), and rank by severity. This feeds the Health/ directory in Phase 2.
 
 **Write synthesis output to `_state/analysis.json`** with the following top-level keys:
 
@@ -157,7 +166,7 @@ See `output-structure.md` for the full schema description and incremental contra
 
 ## Agent Output Schema
 
-All six sections are required. An agent report missing any section must be re-requested before synthesis begins.
+All seven sections are required. An agent report missing any section must be re-requested before synthesis begins.
 
 | Section | Required | Content |
 |---|---|---|
@@ -167,6 +176,7 @@ All six sections are required. An agent report missing any section must be re-re
 | **Dependencies** | Yes | Two groups: (1) other project modules with specific imports, (2) third-party packages with version and purpose |
 | **Complexity** | Yes | Rating (Low/Medium/High) with one-paragraph justification and identification of the single most complex file or function |
 | **Key Files** | Yes | 3–7 files most important to understanding the module, each with path and one-sentence role description |
+| **Limitations & Improvements** | Yes | Classified issues (limitation/bug-risk/improvement) with file path, severity, and suggested fix. "None identified" if the module is clean. |
 
 ---
 
