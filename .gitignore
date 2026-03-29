@@ -11,6 +11,9 @@ Thumbs.db
 # Output
 output/
 
+# Obsidian workspace state
+.obsidian/
+
 # Internal — kept local, not distributed
 research/
 docs/
