@@ -5,13 +5,13 @@
 # Usage:
 #   ./setup.sh [vault-path]
 #
-# vault-path defaults to current directory.
+# vault-path defaults to ./docs-vault (same as code-to-docs --output default).
 # Set CODE_TO_DOCS_VAULT env var for non-standard vault locations.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-VAULT_PATH="${1:-.}"
+VAULT_PATH="${1:-./docs-vault}"
 PROJECT_SETTINGS=".claude/settings.json"
 
 # Resolve absolute path to hook scripts

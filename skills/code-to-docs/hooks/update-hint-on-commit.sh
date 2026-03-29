@@ -5,8 +5,8 @@
 
 set -euo pipefail
 
-VAULT_PATH="${CODE_TO_DOCS_VAULT:-.}"
-STATE_FILE="$VAULT_PATH/docs-vault/_state/analysis.json"
+VAULT_PATH="${CODE_TO_DOCS_VAULT:-./docs-vault}"
+STATE_FILE="$VAULT_PATH/_state/analysis.json"
 
 # Only produce output if a vault exists
 if [[ ! -f "$STATE_FILE" ]]; then
