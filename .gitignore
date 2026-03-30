@@ -17,6 +17,7 @@ output/
 # Internal — kept local, not distributed
 research/
 docs/
+docs-vault/
 scripts/
 .claude-plugin/
 CLAUDE.md
