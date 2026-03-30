@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # code-to-docs: PostToolUse hook — reminds Claude to suggest --update after git commits.
 # Stdout from this script is added to Claude's context.
-# Only fires on Bash tool calls matching "git commit".
+# Fires on all Bash tool calls; checks stdin for "git commit" in the command.
 
 set -euo pipefail
 
@@ -10,6 +10,12 @@ STATE_FILE="$VAULT_PATH/_state/analysis.json"
 
 # Only produce output if a vault exists
 if [[ ! -f "$STATE_FILE" ]]; then
+    exit 0
+fi
+
+# Check if the Bash command contained "git commit"
+COMMAND=$(python3 -c "import json,sys; print(json.load(sys.stdin).get('tool_input',{}).get('command',''))" 2>/dev/null <<< "$(cat)" || echo "")
+if [[ "$COMMAND" != *"git commit"* ]]; then
     exit 0
 fi
 

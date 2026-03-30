@@ -56,7 +56,6 @@ cat > "$HOOKS_TMPFILE" <<HOOKEOF
         "hooks": [
           {
             "type": "command",
-            "if": "Bash(git commit*)",
             "command": "CODE_TO_DOCS_VAULT='$VAULT_PATH' bash '$UPDATE_HOOK'",
             "source": "code-to-docs",
             "timeout": 5
