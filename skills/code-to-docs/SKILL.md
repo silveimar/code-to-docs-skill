@@ -81,6 +81,12 @@ Dispatch in parallel where possible:
 
 ### Phase 3: Verification & Output
 
+#### Phase 3 Dispatch Table
+
+| Agent | Model | Input | Output | Condition |
+|-------|-------|-------|--------|-----------|
+| Verification | **haiku** | vault file list | broken links + frontmatter report | always |
+
 1. **Haiku agent**: Verify every `[[wikilink]]` resolves to an existing generated file, verify every file has complete frontmatter
 2. Report: file count, module count, mode, broken links (if any)
 
@@ -212,6 +218,7 @@ The hooks are lightweight shell scripts in the skill's `hooks/` directory. They 
 8. Fabricating code issues — only report limitations/bugs/improvements that are evidently present in the code
 9. Using Opus for extraction or mechanical tasks — Haiku handles these; Opus is reserved for issue analysis on complex modules and cross-module synthesis on large codebases
 10. Issue analysis agents re-reading entire modules — they receive the Haiku report as input and should only read source files to verify specific concerns
+11. Dispatching an agent without setting the `model` parameter to match the dispatch table for that phase
 
 ---
 
@@ -228,3 +235,4 @@ The hooks are lightweight shell scripts in the skill's `hooks/` directory. They 
 | "I'll skip the code examples in the review" | Before/after snippets are the core educational value. Always include them for bugs and improvements. |
 | "I'll use Opus for everything to be safe" | Opus costs 10-15x more than Haiku. Use the cheapest model that meets the task's cognitive demand. Check the model selection tables. |
 | "This module is simple, I'll skip Pass 2" | Every module gets an issue analysis pass. Simple modules get Sonnet; the pass may report "None identified" — that's a valid outcome. |
+| "I'll just handle this inline instead of dispatching an agent" | The orchestrator runs at Opus. If the dispatch table says Haiku or Sonnet, dispatch an agent — doing the work inline costs 10-15x more. |

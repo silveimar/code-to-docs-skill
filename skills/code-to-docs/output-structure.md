@@ -6,9 +6,11 @@ Supporting reference for the `code-to-docs` skill. Loaded on demand during Phase
 
 ---
 
-## Phase 2 Generation Model Assignments
+## Phase 2 Dispatch Table
 
-Dispatch these as parallel agents where possible. Each agent receives only the data it needs — not the full synthesis.
+This table is the authoritative dispatch reference for Phase 2. Every `Agent()` call MUST set `model:` to match the Model column.
+
+Dispatch as parallel agents where possible. Each agent receives only the data it needs — not the full synthesis.
 
 | Output | Model | Input | Notes |
 |--------|-------|-------|-------|

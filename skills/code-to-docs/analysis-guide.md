@@ -58,6 +58,19 @@ A **module** is an independent subsystem that can be understood without reading 
 
 ---
 
+### Phase 1 Dispatch Table
+
+Every `Agent()` call in Phase 1 MUST set `model:` to match this table.
+
+| Agent | Model | Input | Output | Condition |
+|-------|-------|-------|--------|-----------|
+| Extraction (×N) | **haiku** | module details + entry points | Sections 1-6 report | always, parallel if 3+ modules |
+| Issue Analysis (×N) | **sonnet** | extraction report | Section 7 report | complexity Low/Medium, <1000 LOC, no concurrency |
+| Issue Analysis (×N) | **opus** | extraction report | Section 7 report | complexity High, >1000 LOC, or concurrency/security |
+| Synthesis | **orchestrator** | all module reports | dep graph + narrative | ≤4 modules, tree-shaped deps |
+| Synthesis | **opus** | all module reports | dep graph + narrative | 5+ modules or cyclic deps |
+| State file write | **haiku** | synthesis output | `_state/analysis.json` | always |
+
 ### Step 3: Parallel Agent Dispatch
 
 **Rule: 3 or more independent modules MUST be analyzed in parallel.**
