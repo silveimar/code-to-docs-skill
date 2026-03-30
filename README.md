@@ -77,6 +77,10 @@ flowchart TB
     style UPDATE fill:#6b3a1a,color:#fff
 ```
 
+<p align="center">
+  <img src="assets/code-to-docs-architecture.svg" alt="Module Architecture" width="600">
+</p>
+
 ## What It Does
 
 Point it at a codebase and it produces a complete Obsidian vault:
