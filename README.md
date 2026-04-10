@@ -41,9 +41,9 @@ flowchart TB
 
     subgraph LIFECYCLE["  Development Lifecycle  "]
         direction LR
-        DIGEST["--digest<br/><i>Load context</i>"]
+        DIGEST[":digest<br/><i>Load context</i>"]
         CODE["Code"]
-        UPDATE["--update<br/><i>Sync changes</i>"]
+        UPDATE[":update<br/><i>Sync changes</i>"]
         DIGEST --> CODE --> UPDATE
         UPDATE -. "git diff<br/>re-analyze" .-> PHASE1
     end
@@ -95,8 +95,8 @@ Point it at a codebase and it produces a complete Obsidian vault:
 
 Beyond generation, the skill supports the full development lifecycle:
 
-- **Digest** (`--digest`) — load existing vault context into a conversation before coding (read-only, token-budgeted)
-- **Update** (`--update`) — after coding, re-analyze only changed modules via `git diff`, merge with existing docs, track issue resolution
+- **Digest** (`:digest`) — load existing vault context into a conversation before coding (read-only, token-budgeted)
+- **Update** (`:update`) — after coding, re-analyze only changed modules via `git diff`, merge with existing docs, track issue resolution
 
 ### Modes
 
@@ -104,8 +104,8 @@ Beyond generation, the skill supports the full development lifecycle:
 |------|-------------|
 | **quick** (default) | Architecture overview, module docs, API reference, health assessment, index — all at three audience levels |
 | **full** | Everything in quick + design patterns, onboarding guides, cross-cutting concerns, tutorials |
-| **--update** | Incremental update — diffs against last run, re-analyzes affected modules, auto-selects quick/full |
-| **--digest** | Loads existing vault context into the conversation (read-only, no file writes) |
+| **:update** | Incremental update — diffs against last run, re-analyzes affected modules, auto-selects quick/full |
+| **:digest** | Loads existing vault context into the conversation (read-only, no file writes) |
 
 ### Three Audience Levels
 
@@ -145,8 +145,13 @@ Add this repo as a marketplace source, then install the plugin:
 Copy the skill files directly:
 
 ```bash
-mkdir -p ~/.claude/skills/code-to-docs
+mkdir -p ~/.claude/skills/{code-to-docs,update,digest,hooks,references}
 cp skills/code-to-docs/* ~/.claude/skills/code-to-docs/
+cp skills/update/* ~/.claude/skills/update/
+cp skills/digest/* ~/.claude/skills/digest/
+cp skills/hooks/SKILL.md ~/.claude/skills/hooks/
+cp -r skills/hooks/hooks ~/.claude/skills/hooks/
+cp skills/references/* ~/.claude/skills/references/
 ```
 
 ## Usage
@@ -162,7 +167,7 @@ cp skills/code-to-docs/* ~/.claude/skills/code-to-docs/
 ### Incremental Update (after coding)
 
 ```
-/code-to-docs /path/to/codebase --update
+/code-to-docs:update /path/to/codebase
 ```
 
 Reads `_state/analysis.json` from the existing vault, runs `git diff` against the stored commit, and re-analyzes only affected modules. Auto-selects quick or full based on scope of changes:
@@ -174,9 +179,9 @@ Tracks issues across runs: resolved issues marked, new issues added, unchanged m
 ### Digest Context (before coding)
 
 ```
-/code-to-docs --digest ./docs-vault
-/code-to-docs --digest ./docs-vault --scope Auth,Database --focus issues
-/code-to-docs --digest ./docs-vault --focus all
+/code-to-docs:digest ./docs-vault
+/code-to-docs:digest ./docs-vault --scope Auth,Database --focus issues
+/code-to-docs:digest ./docs-vault --focus all
 ```
 
 Loads existing vault context into the conversation — architecture, module summaries, known issues, session history — without modifying any files. Token-budgeted: <3K default, <6K with scoped modules, <10K with `--focus all`.
@@ -186,9 +191,9 @@ Loads existing vault context into the conversation — architecture, module summ
 The three modes form an optional workflow (shown in the dashed box in the diagram above):
 
 ```
-Session start:  /code-to-docs --digest ./docs-vault --scope {modules you'll touch}
+Session start:  /code-to-docs:digest ./docs-vault --scope {modules you'll touch}
 Coding work:    ... normal development ...
-Session end:    /code-to-docs /path/to/codebase --update
+Session end:    /code-to-docs:update /path/to/codebase
 ```
 
 Each mode works independently — you don't need the full lifecycle to use any single one.
@@ -198,9 +203,9 @@ Each mode works independently — you don't need the full lifecycle to use any s
 Install project-level hooks to automate the digest → code → update lifecycle:
 
 ```
-/code-to-docs --hooks setup              # uses default ./docs-vault
-/code-to-docs --hooks setup ./my-vault   # custom vault path
-/code-to-docs --hooks teardown           # remove hooks (preserves other project hooks)
+/code-to-docs:hooks setup              # uses default ./docs-vault
+/code-to-docs:hooks setup ./my-vault   # custom vault path
+/code-to-docs:hooks teardown           # remove hooks (preserves other project hooks)
 ```
 
 Setup writes two hooks into the project's `.claude/settings.json`:
@@ -208,7 +213,7 @@ Setup writes two hooks into the project's `.claude/settings.json`:
 | Hook | Event | Trigger | What It Does |
 |------|-------|---------|-------------|
 | `digest-on-start.sh` | `SessionStart` | Every new Claude Code session | Injects vault summary into Claude's context: module list, last run info, open issue count, staleness warning if code changed since last doc run |
-| `update-hint-on-commit.sh` | `PostToolUse` | Any `git commit` command | Reminds Claude to suggest `--update` when the coding session is complete |
+| `update-hint-on-commit.sh` | `PostToolUse` | Any `git commit` command | Reminds Claude to suggest `:update` when the coding session is complete |
 
 Hooks are:
 - **Project-local** — written to `.claude/settings.json` in the project root, not global settings
@@ -218,16 +223,16 @@ Hooks are:
 
 ### Arguments
 
-| Argument | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `<path>` | No | `.` (cwd) | Root of the codebase to document |
-| `--mode` | No | `quick` | `quick` or `full` (ignored with `--update`/`--digest`) |
-| `--update` | No | — | Incremental update from existing vault state |
-| `--digest` | No | — | Load existing vault context (read-only) |
-| `--scope` | No (digest only) | all (overview) | Comma-separated module names to load in full |
-| `--focus` | No (digest only) | `architecture` | `architecture`, `issues`, or `all` |
-| `--hooks` | No | — | `setup [vault-path]` or `teardown` — install/remove project-level automation hooks |
-| `--output` | No | `./docs-vault/` | Output path (relative to codebase root) |
+| Argument | Skill | Default | Description |
+|----------|-------|---------|-------------|
+| `<path>` | generate, update | `.` (cwd) | Root of the codebase to document |
+| `--mode` | generate | `quick` | `quick` or `full` |
+| `--output` | generate, update | `./docs-vault/` | Output path (relative to codebase root) |
+| `<vault-path>` | digest | — | Path to existing docs vault (required) |
+| `--scope` | digest | all (overview) | Comma-separated module names to load in full |
+| `--focus` | digest | `architecture` | `architecture`, `issues`, or `all` |
+| `setup [vault-path]` | hooks | `./docs-vault` | Install project-level automation hooks |
+| `teardown` | hooks | — | Remove code-to-docs hooks |
 
 ## Output Structure
 
@@ -255,7 +260,7 @@ docs-vault/
 The `_state/analysis.json` file tracks:
 - Module list and dependency graph
 - Files analyzed with hashes (for change detection)
-- Git commit hash and timestamp (for `--update` diffs)
+- Git commit hash and timestamp (for `:update` diffs)
 - Issues array with open/resolved status (for health tracking across runs)
 - Sessions array logging every generate/update/digest event
 
@@ -282,7 +287,7 @@ If the `obsidian` CLI is available, uses it for note creation and property manag
 
 **Cost discipline:** Each phase has a dispatch table specifying the model tier for every agent call. The orchestrator checks the table before dispatching to prevent tier mismatches (e.g., running Haiku-tier extraction at Opus cost).
 
-### Update (`--update`)
+### Update (`:update`)
 
 1. Reads and **validates** `_state/analysis.json` from existing vault (required fields, types, issue schema)
 2. Runs `git diff <stored_commit>..HEAD` to identify changed files
@@ -293,7 +298,7 @@ If the `obsidian` CLI is available, uses it for note creation and property manag
 7. Updates state file with new commit, merged issues, session entry
 8. Runs full verification across the entire vault
 
-### Digest (`--digest`)
+### Digest (`:digest`)
 
 1. Validates vault exists with `_state/analysis.json`
 2. Loads architecture overview and module map (always)
@@ -305,14 +310,14 @@ If the `obsidian` CLI is available, uses it for note creation and property manag
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Entry point — all modes (generate/update/digest), model tier rules, Phase 3 dispatch table, lifecycle, red flags, rationalization traps |
-| `analysis-guide.md` | Phase 1 reference — Phase 1 dispatch table, two-pass agent templates, model selection, synthesis, incremental update flow with state validation |
-| `obsidian-templates.md` | Phase 2 reference — frontmatter schema, audience levels, health templates, callouts, Mermaid |
-| `output-structure.md` | Phase 2 reference — Phase 2 dispatch table, vault layout, Canvas rules, state file schema with validation |
-| `hooks/setup.sh` | Installs project-level hooks via temp file JSON passing with `source` markers |
-| `hooks/teardown.sh` | Removes code-to-docs hooks by `source` field matching (preserves other hooks) |
-| `hooks/digest-on-start.sh` | SessionStart hook — single python3 call extracts vault summary into context |
-| `hooks/update-hint-on-commit.sh` | PostToolUse hook — reminds to update docs after git commits |
+| `code-to-docs/SKILL.md` | Generate skill (quick/full mode, model tier rules, red flags) |
+| `update/SKILL.md` | Update skill (incremental update flow, issue tracking) |
+| `digest/SKILL.md` | Digest skill (read-only vault context loading, token budgets) |
+| `hooks/SKILL.md` | Hooks skill (setup/teardown project-level automation) |
+| `references/analysis-guide.md` | Phase 1 reference (dispatch table, agent templates, synthesis) |
+| `references/obsidian-templates.md` | Phase 2 reference (frontmatter, audience levels, health templates) |
+| `references/output-structure.md` | Phase 2 reference (dispatch table, vault layout, state schema) |
+| `hooks/hooks/*.sh` | Hook shell scripts for SessionStart and PostToolUse automation |
 
 ## Examples
 
