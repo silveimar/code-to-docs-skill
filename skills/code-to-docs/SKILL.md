@@ -1,37 +1,33 @@
 ---
 name: code-to-docs
-description: Use when generating documentation from a codebase, loading existing project docs for context at session start, updating docs after coding, creating architecture docs, building an Obsidian vault from code, or when someone asks to document or explain a project's structure
+description: Use when generating documentation from a codebase, creating architecture docs, building an Obsidian vault from code, or when someone asks to document or explain a project's structure
 ---
 
 ## Overview
 
 Analyze a codebase and produce an Obsidian-native documentation vault containing architecture diagrams, API references, and teaching-focused explanations written at three audience levels: beginner (language constructs explained), intermediate (patterns and integration), and advanced (failure modes, concurrency, edge cases). Output is ready to open directly in Obsidian with working wikilinks, Mermaid diagrams, and Dataview queries.
 
-Supports a full development lifecycle: **digest** existing docs at session start → code → **update** docs at session end.
+### Related Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `code-to-docs:update` | Incremental update — re-analyze only modules with changes since last run |
+| `code-to-docs:digest` | Load existing vault context into the conversation (read-only) |
+| `code-to-docs:hooks` | Install/remove automation hooks for the generate-digest-update lifecycle |
 
 ## Invocation
 
 ```
 Skill(skill: "code-to-docs", args: "<path> [--mode quick|full] [--output <path>]")
-Skill(skill: "code-to-docs", args: "<path> --update [--output <path>]")
-Skill(skill: "code-to-docs", args: "--digest <vault-path> [--scope <module,...>] [--focus issues|architecture|all]")
 ```
 
-- `<path>` — codebase root (required for generate and update)
-- `--mode` — `quick` (default) or `full`. Ignored when `--update` or `--digest` is set.
-- `--update` — incremental update: re-analyze only modules with changes since last run
-- `--digest` — load existing vault context into the conversation (read-only, no file writes)
-- `--scope` — (digest only) comma-separated module names to load in full
-- `--focus` — (digest only) `architecture` (default), `issues`, or `all`
+- `<path>` — codebase root (required)
+- `--mode` — `quick` (default) or `full`
 - `--output` — vault output path (default: `./docs-vault/` relative to codebase)
 
 **Quick mode:** Architecture overview, module inventory, API reference, codebase health assessment, index pages — all at three audience levels.
 
 **Full mode:** Everything in quick, plus design patterns, onboarding guides, cross-cutting concerns, tutorial walkthroughs.
-
-**Update mode:** Reads `_state/analysis.json` from the existing vault, runs `git diff` against the stored commit, re-analyzes only affected modules, and merges results with existing docs. Auto-selects quick or full based on the scope of changes.
-
-**Digest mode:** Loads structured context from an existing vault into the conversation. Reads — never writes — the vault. Provides architecture, module summaries, known issues, and session history before coding work begins.
 
 ---
 
@@ -55,7 +51,7 @@ This skill uses three model tiers to balance cost and quality. Select tier based
 
 ### Phase 1: Intake & Analysis
 
-Read `analysis-guide.md` for detailed instructions.
+Read `../references/analysis-guide.md` for detailed instructions.
 
 1. Survey the codebase — entry points, config files, directory structure
 2. Identify independent modules
@@ -67,9 +63,9 @@ Read `analysis-guide.md` for detailed instructions.
 
 ### Phase 2: Documentation Generation
 
-Read `obsidian-templates.md` for formatting rules. Read `output-structure.md` for vault layout.
+Read `../references/obsidian-templates.md` for formatting rules. Read `../references/output-structure.md` for vault layout.
 
-**Before dispatching:** Check if `obsidian` CLI is available (`which obsidian`). If yes, use `obsidian create` with `silent` flag for note creation. If no, use direct file writes. See `output-structure.md` "Obsidian CLI Integration" for details.
+**Before dispatching:** Check if `obsidian` CLI is available (`which obsidian`). If yes, use `obsidian create` with `silent` flag for note creation. If no, use direct file writes. See `../references/output-structure.md` "Obsidian CLI Integration" for details.
 
 Dispatch in parallel where possible:
 
@@ -89,120 +85,6 @@ Dispatch in parallel where possible:
 
 1. **Haiku agent**: Verify every `[[wikilink]]` resolves to an existing generated file, verify every file has complete frontmatter
 2. Report: file count, module count, mode, broken links (if any)
-
----
-
-## Digest Mode (`--digest`)
-
-Load structured context from an existing vault into the current conversation. This mode is **read-only** — it never writes files.
-
-**Model: Haiku** — this is a read-and-present task, no analysis or generation.
-
-### Execution
-
-1. **Validate** — check `<vault-path>` exists and contains `_state/analysis.json`. If missing, report "No code-to-docs vault found. Run code-to-docs to generate one first."
-2. **Load baseline** — read `_state/analysis.json` (module list, dependency graph, issues, sessions) and `Architecture/System Overview.md`
-3. **Load focus content:**
-
-| `--focus` | Additional content loaded |
-|-----------|--------------------------|
-| `architecture` (default) | `Architecture/Dependency Map.md`, module Overview + Architecture sections only |
-| `issues` | `Health/Limitations.md`, `Health/Code Review.md`, module Code Review Notes |
-| `all` | Everything in architecture + issues + `Health/Health Summary.md` |
-
-4. **Load scoped modules** — for each module in `--scope`, read the full `Modules/{Name}.md`. Unscoped modules get overview-only.
-5. **Present context** — output a structured summary: project name, last run info, architecture narrative, module map, scoped module content, known issues, recent session history.
-
-### Token Budget
-
-| Scope | Target |
-|-------|--------|
-| Default (architecture only) | < 3,000 tokens |
-| With `--scope` (1-2 modules) | < 6,000 tokens |
-| With `--focus all` | < 10,000 tokens |
-
-If content exceeds targets, truncate module docs to Overview + Architecture sections and note the truncation.
-
-### Digest Red Flags
-
-- Writing any files — digest is read-only
-- Running generation or analysis — if the vault is stale, suggest `--update`, don't run it
-- Loading all module docs in full without `--scope` or `--focus all`
-
----
-
-## Update Mode (`--update`)
-
-When `--update` is set, the skill runs an incremental update instead of a full generation. Read `analysis-guide.md` section "Incremental Update Flow" for detailed instructions.
-
-### Prerequisites
-
-- An existing vault with `_state/analysis.json` at the output path
-- The codebase must be a git repository (needed for `git diff`)
-- If either is missing, fall back to a full generate run and inform the user
-
-### Update Phases
-
-1. **Diff** — Read `_state/analysis.json`, run `git diff <stored_commit>..HEAD --name-only` to get changed files
-2. **Map** — Map changed files to affected modules using the `files_analyzed` entries. Files not in any module are flagged for review (possible new module).
-3. **Auto-select mode:**
-   - **Quick** if: changes are within existing modules only, no new top-level directories, dependency graph unchanged
-   - **Full** if: new modules detected, modules removed, dependency structure changed (new imports across module boundaries), or >50% of tracked files changed
-4. **Re-analyze** — Run the two-pass analysis (Haiku extraction → Sonnet/Opus issues) only on affected modules. Unchanged modules keep their existing reports.
-5. **Merge** — Combine new analysis with existing vault docs:
-   - Regenerate changed module docs
-   - Preserve unchanged module docs
-   - Regenerate Architecture/ and Health/ from the merged synthesis (always — these are cross-module)
-   - Regenerate Index.md (always — cheap, ensures consistency)
-6. **Update state** — Write new `_state/analysis.json` with updated commit hash, timestamp, merged issues (mark resolved issues, add new ones), and append to sessions array
-7. **Verify** — Same as Phase 3 of baseline
-
-### Issue Tracking Across Updates
-
-On each update, compare the new issues against the previous `issues` array:
-
-| Scenario | Action |
-|----------|--------|
-| Issue from previous run still present in re-analyzed module | Keep with status `open` |
-| Issue from previous run absent in re-analyzed module | Change status to `resolved` |
-| Issue from previous run in a module that wasn't re-analyzed | Keep with status `open` (unchanged) |
-| New issue found in re-analyzed module | Add with status `open` |
-
----
-
-## Development Lifecycle
-
-The three modes form an optional workflow:
-
-```
-Session start:  /code-to-docs --digest ./docs-vault --scope {relevant modules}
-Coding work:    ... normal development ...
-Session end:    /code-to-docs /path/to/codebase --update
-```
-
-Each mode works independently — you don't need the full lifecycle to use any single mode. Generate (`quick`/`full`) works without a prior vault. Digest works without an upcoming update. Update works without a prior digest.
-
-### Automating with Hooks (`--hooks`)
-
-To automate the lifecycle for a project, install hooks into the project's `.claude/settings.json`:
-
-```
-/code-to-docs --hooks setup [vault-path]
-/code-to-docs --hooks teardown
-```
-
-**Setup** installs two project-level hooks:
-
-| Hook | Event | Trigger | What It Does |
-|------|-------|---------|-------------|
-| `digest-on-start.sh` | `SessionStart` | Every new session | Injects vault summary into Claude's context: module list, last run info, open issues, staleness warning |
-| `update-hint-on-commit.sh` | `PostToolUse` | `git commit` commands | Reminds Claude to suggest `--update` when the coding session is complete |
-
-**Teardown** removes only code-to-docs hooks — other hooks in the project settings are preserved.
-
-The hooks are lightweight shell scripts in the skill's `hooks/` directory. They read the vault state file and output text to stdout, which Claude Code injects into the conversation context. They never modify files.
-
-**Environment:** Set `CODE_TO_DOCS_VAULT` to override the vault path (defaults to the current directory). The setup script bakes the vault path into the hook commands.
 
 ---
 
