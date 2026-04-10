@@ -297,8 +297,8 @@ When using obsidian CLI, the `obsidian-markdown`, `json-canvas`, and `obsidian-b
 
 **Sessions array** — audit trail of the documentation lifecycle:
 - `type: "generate"` — baseline quick or full run
-- `type: "update"` — incremental update via `--update`
-- `type: "digest"` — recorded when `code-to-docs-digest` loads the vault (read-only, no changes to docs)
+- `type: "update"` — incremental update via `code-to-docs:update`
+- `type: "digest"` — recorded when `code-to-docs:digest` loads the vault (read-only, no changes to docs)
 - `git_commit_start` — the stored commit from the previous state (null on first generate)
 - `git_commit_end` — HEAD at the time of this session
 - `modules_affected` — which modules were analyzed (all for generate, subset for update, none for digest)
@@ -306,7 +306,7 @@ When using obsidian CLI, the `obsidian-markdown`, `json-canvas`, and `obsidian-b
 
 The sessions array provides continuity across the digest → code → update lifecycle. The digest skill reads it to report how stale the documentation is and what changed in recent sessions.
 
-This is the **incremental contract**. The `--update` mode reads this state, runs `git diff` against the stored commit, and re-analyzes only changed modules. The `code-to-docs-digest` skill reads it to provide session-start context. The baseline skill writes this file on every run — do not skip writing it.
+This is the **incremental contract**. The `code-to-docs:update` skill reads this state, runs `git diff` against the stored commit, and re-analyzes only changed modules. The `code-to-docs:digest` skill reads it to provide session-start context. The baseline skill writes this file on every run — do not skip writing it.
 
 ### State File Validation
 

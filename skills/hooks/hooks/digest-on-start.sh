@@ -39,15 +39,15 @@ cat <<EOF
   Current HEAD: $CURRENT_HEAD
   Open issues: $ISSUE_COUNT
 
-To load full context, run: /code-to-docs --digest ./docs-vault
-To load specific modules: /code-to-docs --digest ./docs-vault --scope {module names}
-To see known issues: /code-to-docs --digest ./docs-vault --focus issues
+To load full context, run: /code-to-docs:digest ./docs-vault
+To load specific modules: /code-to-docs:digest ./docs-vault --scope {module names}
+To see known issues: /code-to-docs:digest ./docs-vault --focus issues
 EOF
 
 if [[ "$COMMIT" != "unknown" && "$CURRENT_HEAD" != "unknown" && "$COMMIT" != "$CURRENT_HEAD" ]]; then
     CHANGES=$(git diff --stat "${COMMIT}..HEAD" -- . ':!docs-vault' 2>/dev/null | tail -1 || echo "")
     if [[ -n "$CHANGES" ]]; then
         echo "  Documentation may be stale — $CHANGES since last run."
-        echo "  Run /code-to-docs --update after your work to sync."
+        echo "  Run /code-to-docs:update after your work to sync."
     fi
 fi

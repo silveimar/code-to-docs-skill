@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# code-to-docs: PostToolUse hook — reminds Claude to suggest --update after git commits.
+# code-to-docs: PostToolUse hook — reminds Claude to suggest :update after git commits.
 # Stdout from this script is added to Claude's context.
 # Fires on all Bash tool calls; checks stdin for "git commit" in the command.
 
@@ -19,4 +19,4 @@ if [[ "$COMMAND" != *"git commit"* ]]; then
     exit 0
 fi
 
-echo "[code-to-docs] Code was just committed. When the coding session is complete, consider running /code-to-docs --update to sync documentation with the latest changes."
+echo "[code-to-docs] Code was just committed. When the coding session is complete, consider running /code-to-docs:update to sync documentation with the latest changes."

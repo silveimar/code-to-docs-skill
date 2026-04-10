@@ -312,7 +312,7 @@ These rules apply to all agents and to the orchestrating session.
 
 ## Incremental Update Flow
 
-This section applies only when `--update` is passed. For baseline generation (no `--update`), follow Steps 1-4 above.
+This section applies when invoked via `code-to-docs:update`. For baseline generation (`code-to-docs`), follow Steps 1-4 above.
 
 ### Update Step 1: Load and Validate Previous State
 
