@@ -19,5 +19,8 @@ research/
 docs/
 docs-vault/
 scripts/
+tests/
 .claude-plugin/
+.firecrawl/
+.superpowers/
 CLAUDE.md
