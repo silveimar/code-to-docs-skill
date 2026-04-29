@@ -150,10 +150,10 @@ Ignored local/sensitive areas include **`docs-vault/`**, **`research/`**, **`doc
 | A1 | Bash/Python versions adequate for `json` and `realpath` | Setup fails on exotic environments; add checks. |
 | A2 | Maintainers are sole users of `bump.sh` | Wrong if CI calls bump — document CI prohibition until gated. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **`.gitignore` vs tracked `scripts/`:** `.gitignore` lists `scripts/` but `scripts/bump.sh` is in-repo — confirm intended tracking model so the pre-commit guard and docs don’t conflict.
-2. **Allowlist enforcement mechanism:** Doc-only vs wrapper that refuses unknown network scripts — discretion per CONTEXT.
+1. **`.gitignore` vs tracked `scripts/`:** `.gitignore`’s `scripts/` rule prevents **new untracked** files under `scripts/` from appearing in `git status` by default, but **files already tracked** remain tracked regardless of ignore rules. The repository intentionally ships `scripts/bump.sh` as a tracked maintainer entry point. Phase 2 docs will state this explicitly so contributors do not assume “ignored directory means absent from git.”
+2. **Allowlist enforcement mechanism:** **Documented allowlist + gated `scripts/bump.sh` only** — no repo-wide network syscall wrapper. Enforcement is: (a) policy doc listing approved outbound scripts, (b) `bump.sh` refactored so network I/O cannot run without the publish-lane gate, (c) pre-commit guard for sensitive paths. This matches **02-CONTEXT.md** “Claude’s Discretion” (no extra abstraction layer required).
 
 ## Sources
 
