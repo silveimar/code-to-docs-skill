@@ -1,5 +1,5 @@
-# Runs repository security validation on pull requests (Phase 5 / CI-01–CI-04).
-# Thin workflow: checkout + ./scripts/validate-security.sh — no extra outbound steps.
+# Runs repository security validation on pull requests (Phase 5–6).
+# checkout → validate-security.sh → shellcheck (same scope as bash -n via run-shellcheck.sh).
 
 name: Security validation
 
@@ -24,3 +24,9 @@ jobs:
 
       - name: Run validate-security.sh
         run: ./scripts/validate-security.sh
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck
+        run: ./scripts/run-shellcheck.sh
