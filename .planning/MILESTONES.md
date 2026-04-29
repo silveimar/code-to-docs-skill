@@ -1,5 +1,13 @@
 # Milestones
 
+## v1.1 CI & validation hardening (In progress)
+
+**Roadmap:** [`.planning/ROADMAP.md`](ROADMAP.md) · **Requirements:** [`.planning/REQUIREMENTS.md`](REQUIREMENTS.md)
+
+**Focus:** GitHub Actions PR validation (`validate-security.sh`), shellcheck with scoped policy, documentation and verification.
+
+---
+
 ## v1.0 Local-Only Security Foundation (Shipped: 2026-04-29)
 
 **Archive:** [ROADMAP snapshot](.planning/milestones/v1.0-ROADMAP.md) · [REQUIREMENTS snapshot](.planning/milestones/v1.0-REQUIREMENTS.md)
