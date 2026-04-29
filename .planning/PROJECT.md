@@ -1,14 +1,17 @@
 # Project: Code-to-Docs Skill Hardening (Local-Only)
 
-## Current Milestone: v1.1 CI & validation hardening
+## Completed milestone: v1.1 CI & validation hardening (2026-04-29)
 
-**Goal:** Automate existing security validation on pull requests and tighten shell-script quality so regressions are caught before merge.
+**Delivered:** GitHub Actions on PRs to `main` (`./scripts/validate-security.sh`, `./scripts/run-shellcheck.sh`), scoped shellcheck, and **`docs/security/ci-validation.md`** plus README / outbound-policy updates.
 
-**Target features:**
+## Next milestone
 
-- GitHub Actions workflow that runs `./scripts/validate-security.sh` (and aligned checks) on pull requests.
-- shellcheck and/or stricter shell lint integrated into the validation story, with documentation.
-- CI and local checks remain consistent with the local-first security posture; document behavior under `docs/security` / README.
+*Not started — use `/gsd-new-milestone` when planning the next cycle.*
+
+## Current state (after v1.1)
+
+- **Shipped:** v1.1 as above; requirements in `.planning/REQUIREMENTS.md`; roadmap `.planning/ROADMAP.md`.
+- **PR CI:** `.github/workflows/security-ci.yml`; maintainer doc: `docs/security/ci-validation.md`.
 
 ## Current state (after v1.0)
 
@@ -107,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-04-29 — milestone v1.1 started*
+*Last updated: 2026-04-29 — milestone v1.1 complete*

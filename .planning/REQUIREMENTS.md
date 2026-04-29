@@ -1,7 +1,7 @@
 # Requirements: v1.1 CI & validation hardening
 
 **Milestone:** v1.1  
-**Status:** Active (draft → roadmap)  
+**Status:** Complete (2026-04-29)  
 **Scope:** Add PR CI that runs existing validation scripts and integrate shellcheck with documented parity to local runs—without expanding outbound surface beyond v1.0 policy.
 
 ## Functional requirements
@@ -21,14 +21,14 @@
 
 ### Documentation & traceability
 
-- [ ] **DOC-01**: `README` and/or `docs/security/` explains when CI runs, what it runs, and how it relates to local `./scripts/validate-security.sh` and shellcheck.
-- [ ] **DOC-02**: Planning or verification artifacts record how v1.1 was verified (e.g. checklist item, `VERIFICATION.md`, or phase notes)—consistent with repo conventions.
+- [x] **DOC-01**: `README` and/or `docs/security/` explains when CI runs, what it runs, and how it relates to local `./scripts/validate-security.sh` and shellcheck.
+- [x] **DOC-02**: Planning or verification artifacts record how v1.1 was verified (e.g. checklist item, `VERIFICATION.md`, or phase notes)—consistent with repo conventions.
 
 ## Non-functional requirements
 
-- [ ] **NFR-01**: CI does not introduce undisclosed outbound calls or secrets usage inconsistent with `docs/security` outbound policy.
-- [ ] **NFR-02**: Validation remains reproducible: same scripts locally and in CI produce aligned outcomes for the supported environment (document any Linux/macOS differences).
-- [ ] **NFR-03**: English for assistant-facing and planning artifacts (extends v1.0 FR-5).
+- [x] **NFR-01**: CI does not introduce undisclosed outbound calls or secrets usage inconsistent with `docs/security` outbound policy.
+- [x] **NFR-02**: Validation remains reproducible: same scripts locally and in CI produce aligned outcomes for the supported environment (document any Linux/macOS differences).
+- [x] **NFR-03**: English for assistant-facing and planning artifacts (extends v1.0 FR-5).
 
 ## Future requirements (deferred)
 

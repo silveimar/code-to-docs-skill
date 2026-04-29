@@ -3,11 +3,11 @@
 ## Milestones
 
 - ✅ **v1.0 — Local-Only Security Foundation** (Phases 1–4, shipped **2026-04-29**) — [archived roadmap](.planning/milestones/v1.0-ROADMAP.md) · [archived requirements](.planning/milestones/v1.0-REQUIREMENTS.md)
-- **v1.1 — CI & validation hardening** (Phases 5–7, **in progress**) — requirements: [`.planning/REQUIREMENTS.md`](REQUIREMENTS.md)
+- **v1.1 — CI & validation hardening** (Phases 5–7, **shipped 2026-04-29**) — requirements: [`.planning/REQUIREMENTS.md`](REQUIREMENTS.md)
 
 ## Current work
 
-**Milestone v1.1** — PR CI running `./scripts/validate-security.sh`, shellcheck with scoped policy, documentation and verification aligned with v1.0 local-first posture.
+*v1.1 complete. Use `/gsd-new-milestone` for the next cycle.*
 
 ---
 
@@ -55,7 +55,8 @@
 **Goal:** Document CI vs local parity, update security/onboarding docs, and record verification per repo conventions.
 
 **Requirements:** DOC-01, DOC-02, NFR-01, NFR-02, NFR-03  
-**Depends on:** Phases 5–6.
+**Depends on:** Phases 5–6.  
+**Status:** Complete (2026-04-29) — `docs/security/ci-validation.md`, README, outbound allowlist, checklist, `PROJECT`/`MILESTONES`, Phase 7 `VERIFICATION.md`.
 
 **Success criteria**
 

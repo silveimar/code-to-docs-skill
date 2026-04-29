@@ -2,59 +2,57 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: CI & validation hardening
-status: In progress — Phase 6 complete, Phase 7 next
-stopped_at: Phase 6 complete — shellcheck wired in CI and locally
-last_updated: "2026-04-29T20:05:00.000Z"
-last_activity: 2026-04-29 — `/gsd-discuss-phase 6 --chain` completed through execution
+status: Milestone v1.1 complete
+stopped_at: Phase 7 complete — docs and verification shipped
+last_updated: "2026-04-29T21:00:00.000Z"
+last_activity: 2026-04-29 — `/gsd-discuss-phase 7 --chain` completed through execution
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 66
+  completed_phases: 3
+  total_plans: 3
+  completed_plans: 3
+  percent: 100
 ---
 
 # STATE
 
 ## Project Status
 
-- Workflow: **Milestone v1.1** — Phases 5–6 shipped; **Phase 7** (docs + milestone closure) next
+- Workflow: **Between milestones** — v1.1 shipped; next: **`/gsd-new-milestone`**
 - Initialization: complete
-- **Last shipped:** v1.0 (2026-04-29)
-- Next step: **`/gsd-discuss-phase 7 --chain`** or **`/gsd-plan-phase 7`**
+- **Last shipped:** v1.1 (2026-04-29)
+- Next command: **`/gsd-new-milestone`** (optional) or continue maintenance PRs
 
 ## Project reference
 
-See `.planning/PROJECT.md` (current milestone: v1.1).
+See `.planning/PROJECT.md`.
 
 **Core value:** Local-first operation with explicit policy, guards, and repeatable validation.
 
-**Current focus:** v1.1 — documentation and verification pass (Phase 7).
+**Current focus:** None — milestone cycle closed unless you start a new milestone.
 
 ## Active context
 
-- Maintainer gates: `./scripts/validate-security.sh`, `./scripts/run-shellcheck.sh`, `./scripts/security-regression.sh`
-- PR CI: `.github/workflows/security-ci.yml`
-- Archive: `.planning/milestones/v1.0-ROADMAP.md`, `v1.0-REQUIREMENTS.md`
-- Summary: `.planning/reports/MILESTONE_SUMMARY-v1.0.md`
+- CI: `.github/workflows/security-ci.yml` — `validate-security.sh` + `run-shellcheck.sh`
+- Docs: `docs/security/ci-validation.md`, `docs/security/outbound-allowlist.md`
+- Archive: v1.0 under `.planning/milestones/`; v1.1 roadmap lives in `.planning/ROADMAP.md`
 
 ## Decisions
 
-Preserved in phase CONTEXT files under `.planning/phases/` and milestone archives.
+Captured in `.planning/phases/*-CONTEXT.md` and phase `VERIFICATION.md` files.
 
 ## Open items
 
-- **Phase 7** — README / `docs/security/` CI parity, milestone verification, NFR closure.
-- Optional: formal `04-UAT.md` for v1.0 remains in archive if needed.
+- Optional: `/gsd-complete-milestone` if you want archived snapshots under `.planning/milestones/` for v1.1 (beyond index updates already made).
 
 ## Session continuity
 
-- **Stopped at:** Phase 6 context gathered
-- **Resume file:** .planning/phases/06-shellcheck-integration/06-CONTEXT.md
+- **Stopped at:** Milestone v1.1 documentation phase complete
+- **Resume file:** None
 
 ## Current Position
 
-Phase: **7 — Documentation, verification, and milestone closure prep** (not started)  
+Phase: **—** (no active phase)  
 Plan: —  
-Status: Phases 5–6 delivered — `validate-security.sh` + `run-shellcheck.sh` in CI  
-Last activity: 2026-04-29 — `/gsd-discuss-phase 6 --chain` completed through execution
+Status: Milestone **v1.1** requirements and docs complete  
+Last activity: 2026-04-29 — Phase 7 documentation + verification
