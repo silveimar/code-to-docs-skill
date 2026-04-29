@@ -1,0 +1,26 @@
+# Runs repository security validation on pull requests (Phase 5 / CI-01–CI-04).
+# Thin workflow: checkout + ./scripts/validate-security.sh — no extra outbound steps.
+
+name: Security validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-validate:
+    name: security-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run validate-security.sh
+        run: ./scripts/validate-security.sh
