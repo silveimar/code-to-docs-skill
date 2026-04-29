@@ -6,11 +6,12 @@
 set -euo pipefail
 
 VAULT_PATH="${CODE_TO_DOCS_VAULT:-./docs-vault}"
+VAULT_DISPLAY="$(basename "$VAULT_PATH")"
 
 STATE_FILE="$VAULT_PATH/_state/analysis.json"
 
 if [[ ! -f "$STATE_FILE" ]]; then
-    echo "[code-to-docs] No documentation vault found at $VAULT_PATH — run /code-to-docs to generate one."
+    echo "[code-to-docs] No documentation vault found (${VAULT_DISPLAY}) — run /code-to-docs to generate one."
     exit 0
 fi
 
