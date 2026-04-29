@@ -11,6 +11,7 @@ progress:
   completed_phases: 1
   total_plans: 1
   completed_plans: 1
+  percent: 33
 ---
 
 # STATE
