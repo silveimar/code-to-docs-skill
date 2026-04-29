@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Phase 3 execution complete (03-01)
-last_updated: "2026-04-29T17:10:00.000Z"
+stopped_at: Phase 3 UAT complete (03-UAT.md)
+last_updated: "2026-04-29T18:00:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 2
@@ -20,8 +20,8 @@ progress:
 - Workflow: `gsd-execute-phase` / auto-chain from `/gsd-next --auto`
 - Initialization: complete
 - Current milestone: 1
-- Current phase: 3 (execution complete — plan `03-01`; UAT not yet run)
-- Next command: `/gsd-verify-work 3` **or** `/gsd-next --auto` to continue the pipeline toward Phase 4
+- Current phase: 3 (execution + UAT complete for plan `03-01`)
+- Next command: `/gsd-discuss-phase 4 --auto` or `/gsd-next --auto` to advance toward Phase 4 (hardening validation)
 
 ## Active Context
 
@@ -34,10 +34,9 @@ progress:
 
 ## Open Items
 
-- Run conversational UAT for Phase 3 (`/gsd-verify-work 3`) when desired.
-- Phase 4 (hardening validation / regression) remains on roadmap.
+- Phase 4 (hardening validation / regression) — next on roadmap.
 
 ## Session Continuity
 
-- **Stopped at:** Phase 3 plan `03-01` executed (see `03-01-SUMMARY.md`)
-- **Resume file:** `.planning/phases/03-secure-content-handling-and-redaction/VERIFICATION.md`
+- **Stopped at:** Phase 3 UAT passed (see `03-UAT.md`)
+- **Resume file:** `.planning/phases/03-secure-content-handling-and-redaction/03-UAT.md`

@@ -36,8 +36,8 @@
 
 ### Phase 3: Secure Content Handling and Redaction
 **Goal:** Reduce leakage risk from logs, traces, and generated artifacts.
-**Status:** Implementation complete (2026-04-29); UAT optional
-**Evidence:** `.planning/phases/03-secure-content-handling-and-redaction/VERIFICATION.md` (PASS), `03-01-SUMMARY.md`
+**Status:** Completed (2026-04-29)
+**Evidence:** `.planning/phases/03-secure-content-handling-and-redaction/VERIFICATION.md` (PASS), `03-01-SUMMARY.md`, `03-UAT.md` (complete)
 
 **Deliverables**
 - Sensitive content handling policy.
