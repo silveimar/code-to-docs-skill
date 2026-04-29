@@ -1,0 +1,19 @@
+{
+  "project_name": "code-to-docs-skill",
+  "mode": "manual",
+  "language": "en",
+  "workflow_preferences": {
+    "security_first": true,
+    "local_only": true,
+    "require_verification_before_completion": true,
+    "prefer_small_auditable_changes": true
+  },
+  "privacy_defaults": {
+    "allow_remote_sync": false,
+    "allow_external_telemetry": false,
+    "redact_sensitive_content_in_logs": true,
+    "retain_local_artifacts_only": true
+  },
+  "initialized_from": "gsd-new-project",
+  "initialized_at_note": "Set by automated new-project initialization flow"
+}
