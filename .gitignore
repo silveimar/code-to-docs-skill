@@ -16,7 +16,10 @@ output/
 
 # Internal — kept local, not distributed
 research/
-docs/
+# docs/ — internal by default; exception for shipped security policy (Phase 2)
+docs/**
+!docs/security/
+!docs/security/**
 docs-vault/
 scripts/
 tests/
