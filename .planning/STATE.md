@@ -1,34 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: Local-Only Security Foundation
-status: complete
-stopped_at: Milestone v1.0 archived and tagged
-last_updated: "2026-04-29T18:00:00.000Z"
+milestone: v1.1
+milestone_name: CI & validation hardening
+status: planning
+last_updated: "2026-04-29T17:39:15.955Z"
+last_activity: 2026-04-29
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE
 
 ## Project Status
 
-- Workflow: **Between milestones** — ready for `/gsd-new-milestone`
+- Workflow: **Milestone v1.1** — defining requirements and roadmap
 - Initialization: complete
 - **Last shipped:** v1.0 (2026-04-29)
-- Next command: **`/gsd-new-milestone`** (creates fresh requirements + roadmap for next cycle)
+- Next step after roadmap: **`/gsd-discuss-phase [N]`** or **`/gsd-plan-phase [N]`**
 
 ## Project reference
 
-See `.planning/PROJECT.md` (updated after v1.0).
+See `.planning/PROJECT.md` (current milestone: v1.1).
 
 **Core value:** Local-first operation with explicit policy, guards, and repeatable validation.
 
-**Current focus:** Planning the next milestone (no active roadmap phase until `/gsd-new-milestone`).
+**Current focus:** v1.1 — CI gate + shell validation hardening (requirements and roadmap in progress).
 
 ## Active context
 
@@ -38,14 +38,21 @@ See `.planning/PROJECT.md` (updated after v1.0).
 
 ## Decisions
 
-Preserved in phase CONTEXT files under `.planning/phases/` and milestone archives.
+Preserved in phase CONTEXT files under `.planning/phases/` and milestone archives (v1.0 phases cleared; snapshot in `.planning/milestones/`).
 
 ## Open items
 
-- Define **v1.1** (or next) scope via `/gsd-new-milestone`.
-- Optional: `/gsd-verify-work 4` if you still want a formal `04-UAT.md`.
+- Complete `.planning/REQUIREMENTS.md` and `.planning/ROADMAP.md` for v1.1.
+- Optional: formal `04-UAT.md` for v1.0 remains in archive if needed.
 
 ## Session continuity
 
-- **Stopped at:** Milestone v1.0 complete
+- **Stopped at:** Milestone v1.1 planning (requirements/roadmap)
 - **Resume file:** None
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-29 — Milestone v1.1 started

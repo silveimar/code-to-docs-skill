@@ -1,5 +1,15 @@
 # Project: Code-to-Docs Skill Hardening (Local-Only)
 
+## Current Milestone: v1.1 CI & validation hardening
+
+**Goal:** Automate existing security validation on pull requests and tighten shell-script quality so regressions are caught before merge.
+
+**Target features:**
+
+- GitHub Actions workflow that runs `./scripts/validate-security.sh` (and aligned checks) on pull requests.
+- shellcheck and/or stricter shell lint integrated into the validation story, with documentation.
+- CI and local checks remain consistent with the local-first security posture; document behavior under `docs/security` / README.
+
 ## Current state (after v1.0)
 
 - **Shipped:** Milestone **v1.0 — Local-Only Security Foundation** (2026-04-29). See `.planning/MILESTONES.md` and `.planning/milestones/v1.0-ROADMAP.md`.
@@ -57,14 +67,6 @@ Milestone v1.0 implemented and verified the full set from the archived [v1.0 req
 - Data handling policies for source, docs, logs, caches, exports.
 - Baseline verification integrated: `./scripts/validate-security.sh`, `./scripts/security-regression.sh`, `docs/security/validation-checklist.md`.
 
-## Next milestone goals (draft)
-
-*Refine with `/gsd-new-milestone` — until then, candidates include:*
-
-- Optional **GitHub Actions** job running `./scripts/validate-security.sh` on PRs.
-- **shellcheck** or stricter shell lint in validation script.
-- Backlog: encrypted local storage, policy-as-code, security scorecard (from roadmap backlog).
-
 ## Constraints
 
 - Operate primarily in local environment.
@@ -82,7 +84,27 @@ Milestone v1.0 implemented and verified the full set from the archived [v1.0 req
 - Controls that are too strict may reduce usability.
 - Hidden egress paths across tools/plugins.
 - Local machine compromise remains largely out of scope for this repo.
+- CI must not introduce unintended outbound calls or secrets exposure beyond what v1.0 already allows.
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
 
 ---
 
-*Last updated: 2026-04-29 after v1.0 milestone complete*
+*Last updated: 2026-04-29 — milestone v1.1 started*
