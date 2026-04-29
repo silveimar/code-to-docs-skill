@@ -1,0 +1,51 @@
+# Requirements: v1.1 CI & validation hardening
+
+**Milestone:** v1.1  
+**Status:** Active (draft → roadmap)  
+**Scope:** Add PR CI that runs existing validation scripts and integrate shellcheck with documented parity to local runs—without expanding outbound surface beyond v1.0 policy.
+
+## Functional requirements
+
+### CI & GitHub Actions
+
+- [ ] **CI-01**: On pull requests targeting the default branch (and equivalent events agreed in implementation), a GitHub Actions workflow runs automatically.
+- [ ] **CI-02**: The workflow executes `./scripts/validate-security.sh` (or a documented entrypoint that delegates to it) on a Linux runner; non-zero exit fails the job.
+- [ ] **CI-03**: The workflow declares minimal `permissions` appropriate for checkout-and-validate (document rationale if anything broader is required).
+- [ ] **CI-04**: Workflow steps are structured so logs clearly indicate validation vs shellcheck failure (separate steps or equivalent).
+
+### Shell validation
+
+- [ ] **SHL-01**: shellcheck runs in CI against an explicitly documented scope (paths/globs), including any justified exclusions or `shellcheck` directives in scripts.
+- [ ] **SHL-02**: shellcheck failures fail the CI job according to the agreed severity policy (e.g. errors only vs warnings—documented).
+- [ ] **SHL-03**: Maintainers can reproduce shellcheck locally with the same scope (commands documented).
+
+### Documentation & traceability
+
+- [ ] **DOC-01**: `README` and/or `docs/security/` explains when CI runs, what it runs, and how it relates to local `./scripts/validate-security.sh` and shellcheck.
+- [ ] **DOC-02**: Planning or verification artifacts record how v1.1 was verified (e.g. checklist item, `VERIFICATION.md`, or phase notes)—consistent with repo conventions.
+
+## Non-functional requirements
+
+- [ ] **NFR-01**: CI does not introduce undisclosed outbound calls or secrets usage inconsistent with `docs/security` outbound policy.
+- [ ] **NFR-02**: Validation remains reproducible: same scripts locally and in CI produce aligned outcomes for the supported environment (document any Linux/macOS differences).
+- [ ] **NFR-03**: English for assistant-facing and planning artifacts (extends v1.0 FR-5).
+
+## Future requirements (deferred)
+
+- Encrypted local artifact storage — backlog; not v1.1.
+- Policy-as-code / automated scorecard — backlog; not v1.1.
+- Running full `security-regression.sh` on every PR if deemed too slow — optional follow-up; decide explicitly if deferred.
+
+## Out of scope
+
+- Changing v1.0 security policy fundamentals or allowlist semantics beyond what CI needs to run.
+- Org-level branch protection configuration (may be recommended in docs only).
+- Non–GitHub CI platforms (unless later milestone).
+
+## Traceability
+
+| REQ ID | Phase (planned) | Roadmap / plan reference |
+|--------|-----------------|--------------------------|
+| CI-01–CI-04 | 5 | See `.planning/ROADMAP.md` — Phase 5 |
+| SHL-01–SHL-03 | 6 | See `.planning/ROADMAP.md` — Phase 6 |
+| DOC-01–DOC-02, NFR-01–NFR-03 | 7 | See `.planning/ROADMAP.md` — Phase 7 |
