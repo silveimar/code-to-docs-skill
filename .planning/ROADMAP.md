@@ -4,6 +4,7 @@
 
 ### Phase 1: Threat Model and Data Flow Baseline
 **Goal:** Identify and document how sensitive code/content moves through the project.
+**Requirements:** [FR-1, FR-2, FR-3, FR-4, FR-5, NFR-1, NFR-2, NFR-3]
 
 **Deliverables**
 - Initial threat model focused on local-only operation.
