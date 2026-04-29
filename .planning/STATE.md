@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: in_progress
-stopped_at: Phase 4 plan `04-01` executed
-last_updated: "2026-04-29T16:44:43.783Z"
+milestone_name: Local-Only Security Foundation
+status: complete
+stopped_at: Milestone v1.0 archived and tagged
+last_updated: "2026-04-29T18:00:00.000Z"
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 3
+  completed_phases: 4
+  total_plans: 4
   completed_plans: 4
   percent: 100
 ---
@@ -17,29 +17,35 @@ progress:
 
 ## Project Status
 
-- Workflow: post-Phase-4 UAT / milestone wrap-up
+- Workflow: **Between milestones** — ready for `/gsd-new-milestone`
 - Initialization: complete
-- Current milestone: 1
-- Current phase: 4 (execution complete — plan `04-01`)
-- Next command: `/gsd-verify-work 4` **or** `/gsd-complete-milestone` / `/gsd-milestone-summary` when ready to close Milestone 1
+- **Last shipped:** v1.0 (2026-04-29)
+- Next command: **`/gsd-new-milestone`** (creates fresh requirements + roadmap for next cycle)
 
-## Active Context
+## Project reference
 
-- **Aggregate validation:** `./scripts/validate-security.sh`
-- **Regression:** `./scripts/security-regression.sh`
-- **Checklist:** `docs/security/validation-checklist.md`
+See `.planning/PROJECT.md` (updated after v1.0).
+
+**Core value:** Local-first operation with explicit policy, guards, and repeatable validation.
+
+**Current focus:** Planning the next milestone (no active roadmap phase until `/gsd-new-milestone`).
+
+## Active context
+
+- Maintainer gates: `./scripts/validate-security.sh`, `./scripts/security-regression.sh`
+- Archive: `.planning/milestones/v1.0-ROADMAP.md`, `v1.0-REQUIREMENTS.md`
+- Summary: `.planning/reports/MILESTONE_SUMMARY-v1.0.md`
 
 ## Decisions
 
-See `04-CONTEXT.md` **D-01–D-06** for Phase 4 packaging decisions.
+Preserved in phase CONTEXT files under `.planning/phases/` and milestone archives.
 
-## Open Items
+## Open items
 
-- **Onboarding:** Milestone summary for reviewers — `.planning/reports/MILESTONE_SUMMARY-v1.0.md`.
-- Optional: `/gsd-verify-work 4` for conversational UAT on maintainer scripts.
-- Milestone 1 completion / archive (`/gsd-complete-milestone`) when satisfied.
+- Define **v1.1** (or next) scope via `/gsd-new-milestone`.
+- Optional: `/gsd-verify-work 4` if you still want a formal `04-UAT.md`.
 
-## Session Continuity
+## Session continuity
 
-- **Stopped at:** Phase 4 plan `04-01` executed
+- **Stopped at:** Milestone v1.0 complete
 - **Resume file:** None
