@@ -21,6 +21,8 @@
 ### Phase 2: Local-Only Guardrails Implementation
 **Goal:** Enforce local-first defaults and block accidental data egress.
 **Requirements:** [FR-1, FR-2, FR-4, NFR-1, NFR-2, NFR-3]
+**Status:** Completed (2026-04-29)
+**Evidence:** `.planning/phases/02-local-only-guardrails-implementation/VERIFICATION.md` (PASS), `02-01-SUMMARY.md`
 
 **Deliverables**
 - Config and workflow controls that default to local-only behavior.
@@ -34,6 +36,8 @@
 
 ### Phase 3: Secure Content Handling and Redaction
 **Goal:** Reduce leakage risk from logs, traces, and generated artifacts.
+**Status:** Implementation complete (2026-04-29); UAT optional
+**Evidence:** `.planning/phases/03-secure-content-handling-and-redaction/VERIFICATION.md` (PASS), `03-01-SUMMARY.md`
 
 **Deliverables**
 - Sensitive content handling policy.
