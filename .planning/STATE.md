@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-04-29T17:39:15.955Z"
 last_activity: 2026-04-29
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -42,7 +42,7 @@ Preserved in phase CONTEXT files under `.planning/phases/` and milestone archive
 
 ## Open items
 
-- Complete `.planning/REQUIREMENTS.md` and `.planning/ROADMAP.md` for v1.1.
+- Start **Phase 5** — `/gsd-discuss-phase 5` or `/gsd-plan-phase 5`.
 - Optional: formal `04-UAT.md` for v1.0 remains in archive if needed.
 
 ## Session continuity
@@ -52,7 +52,7 @@ Preserved in phase CONTEXT files under `.planning/phases/` and milestone archive
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: **5 — PR CI workflow + Linux validation path** (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-29 — Milestone v1.1 started
+Status: Roadmap approved — ready for discuss-phase / plan-phase
+Last activity: 2026-04-29 — Milestone v1.1 roadmap created (Phases 5–7)
