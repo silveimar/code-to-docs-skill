@@ -26,6 +26,9 @@ scripts/**
 !scripts/bump.sh
 !scripts/pre-commit
 !scripts/pre-commit-guard.sh
+!scripts/validate-security.sh
+!scripts/security-regression.sh
+!scripts/redact_public_text.py
 tests/
 .claude-plugin/
 .firecrawl/

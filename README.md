@@ -333,6 +333,15 @@ Three test scenarios in `tests/`:
 - `pressure-test-full-mode.md` — validates full mode additions
 - `pressure-test-parallel.md` — validates parallel dispatch discipline on 5+ modules
 
+## Local security validation
+
+Maintainer scripts enforce the local-only hardening from this repo’s security phases:
+
+- **`./scripts/validate-security.sh`** — shell syntax, redact helper, policy files, and vault path validation in one pass (exit non-zero on failure).
+- **`./scripts/security-regression.sh`** — confirms `pre-commit-guard.sh` still blocks a staged `docs-vault/` path in a throwaway git repo.
+
+See **`docs/security/validation-checklist.md`** for the full checkbox list and optional CI notes.
+
 ## Obsidian Integration
 
 ### Obsidian Bases (native, no plugins)

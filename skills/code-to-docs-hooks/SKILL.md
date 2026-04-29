@@ -55,6 +55,10 @@ Removes hooks by matching the `source` field. Other hooks in settings.json are l
 
 Set `CODE_TO_DOCS_VAULT` to override the default vault path. This is picked up by both setup and the hook scripts themselves.
 
+## Sensitive content (SessionStart output)
+
+Vault-derived labels shown by `digest-on-start.sh` are passed through `scripts/redact_public_text.py` so common token/email shapes are replaced with `[REDACTED]` before entering the assistant context. Policy and pattern rationale: `docs/security/sensitive-content-handling.md`.
+
 ## Hook Scripts
 
 | Script | Purpose |

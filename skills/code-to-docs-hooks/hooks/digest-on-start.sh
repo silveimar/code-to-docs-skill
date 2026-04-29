@@ -5,6 +5,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REDACT="${REPO_ROOT}/scripts/redact_public_text.py"
+
 VAULT_PATH="${CODE_TO_DOCS_VAULT:-./docs-vault}"
 VAULT_DISPLAY="$(basename "$VAULT_PATH")"
 
@@ -30,6 +34,11 @@ print(f'{project}\t{modules}\t{commit}\t{timestamp}\t{mode}\t{issue_count}')
 " 2>/dev/null || echo "unknown	unknown	unknown	unknown	unknown	0"
 )"
 
+if [[ -f "$REDACT" ]]; then
+    PROJECT=$(printf '%s' "$PROJECT" | python3 "$REDACT" 2>/dev/null || echo "[REDACTED]")
+    MODULES=$(printf '%s' "$MODULES" | python3 "$REDACT" 2>/dev/null || echo "[REDACTED]")
+fi
+
 # Check staleness
 CURRENT_HEAD=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
@@ -47,6 +56,9 @@ EOF
 
 if [[ "$COMMIT" != "unknown" && "$CURRENT_HEAD" != "unknown" && "$COMMIT" != "$CURRENT_HEAD" ]]; then
     CHANGES=$(git diff --stat "${COMMIT}..HEAD" -- . ':!docs-vault' 2>/dev/null | tail -1 || echo "")
+    if [[ -n "$CHANGES" && -f "$REDACT" ]]; then
+        CHANGES=$(printf '%s' "$CHANGES" | python3 "$REDACT" 2>/dev/null || echo "[REDACTED]")
+    fi
     if [[ -n "$CHANGES" ]]; then
         echo "  Documentation may be stale — $CHANGES since last run."
         echo "  Run /code-to-docs:update after your work to sync."
