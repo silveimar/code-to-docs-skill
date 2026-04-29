@@ -37,7 +37,8 @@
 **Goal:** Add shellcheck to CI with explicit scope, severity policy, and local reproduction steps.
 
 **Requirements:** SHL-01, SHL-02, SHL-03  
-**Depends on:** Phase 5 (stable validation job).
+**Depends on:** Phase 5 (stable validation job).  
+**Status:** Complete (2026-04-29) — `scripts/run-shellcheck.sh`, workflow shellcheck steps, phase `VERIFICATION.md`.
 
 **Success criteria**
 

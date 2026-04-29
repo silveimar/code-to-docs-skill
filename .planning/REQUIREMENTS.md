@@ -15,9 +15,9 @@
 
 ### Shell validation
 
-- [ ] **SHL-01**: shellcheck runs in CI against an explicitly documented scope (paths/globs), including any justified exclusions or `shellcheck` directives in scripts.
-- [ ] **SHL-02**: shellcheck failures fail the CI job according to the agreed severity policy (e.g. errors only vs warnings—documented).
-- [ ] **SHL-03**: Maintainers can reproduce shellcheck locally with the same scope (commands documented).
+- [x] **SHL-01**: shellcheck runs in CI against an explicitly documented scope (paths/globs), including any justified exclusions or `shellcheck` directives in scripts.
+- [x] **SHL-02**: shellcheck failures fail the CI job according to the agreed severity policy (e.g. errors only vs warnings—documented).
+- [x] **SHL-03**: Maintainers can reproduce shellcheck locally with the same scope (commands documented).
 
 ### Documentation & traceability
 
