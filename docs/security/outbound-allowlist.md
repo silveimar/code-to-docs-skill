@@ -41,7 +41,19 @@ CODE_TO_DOCS_PUBLISH=1 ./scripts/bump.sh minor
 
 If the publish lane is enabled but `gh` is missing or not authenticated, the script **exits non-zero** (fail-closed). Push and `gh` failures are **not** masked in the publish lane (**D-01**, **D-09**).
 
+## GitHub Actions CI (read-only validation)
+
+PR validation (`.github/workflows/security-ci.yml`) is **not** a general egress path for repo scripts:
+
+| Step | Network / remote behavior | Rationale |
+|------|-----------------------------|-----------|
+| `actions/checkout@v4` | GitHub fetching the repo (standard Actions) | Required to run checks on PR code. |
+| `apt-get install shellcheck` on `ubuntu-latest` | Ubuntu package mirrors only | Installs the static analyzer; no project secrets or custom endpoints. |
+
+Validation steps themselves (`./scripts/validate-security.sh`, `./scripts/run-shellcheck.sh`) match local behavior and do not introduce additional outbound calls beyond v1.0 expectations. See **`docs/security/ci-validation.md`**.
+
 ## References
 
 - Decisions **D-01–D-03**: `.planning/phases/02-local-only-guardrails-implementation/02-CONTEXT.md`
 - Implementation: `scripts/bump.sh`
+- CI detail: `docs/security/ci-validation.md`

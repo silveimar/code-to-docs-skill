@@ -338,9 +338,12 @@ Three test scenarios in `tests/`:
 Maintainer scripts enforce the local-only hardening from this repo’s security phases:
 
 - **`./scripts/validate-security.sh`** — shell syntax, redact helper, policy files, and vault path validation in one pass (exit non-zero on failure).
+- **`./scripts/run-shellcheck.sh`** — `shellcheck` on the same `*.sh` trees as the syntax pass (`scripts/`, `skills/code-to-docs-hooks/hooks/`); requires `shellcheck` on `PATH`.
 - **`./scripts/security-regression.sh`** — confirms `pre-commit-guard.sh` still blocks a staged `docs-vault/` path in a throwaway git repo.
 
-See **`docs/security/validation-checklist.md`** for the full checkbox list and optional CI notes.
+**Pull requests** targeting `main` run the same aggregate validation plus shellcheck in **GitHub Actions** (see `.github/workflows/security-ci.yml`). Full detail, triggers, and outbound posture: **`docs/security/ci-validation.md`**.
+
+See **`docs/security/validation-checklist.md`** for the full checkbox list.
 
 ## Obsidian Integration
 

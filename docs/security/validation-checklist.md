@@ -25,6 +25,11 @@ Use this checklist for **manual** PR / release review. Automated aggregate: `./s
 
 - [ ] `CODE_TO_DOCS_VAULT='foo"bar' bash skills/code-to-docs-hooks/hooks/setup.sh` exits non-zero (included in validate script).
 
-## Optional CI
+## GitHub Actions CI (v1.1)
 
-- [ ] If adding GitHub Actions later, wire `./scripts/validate-security.sh` as a job step (not required for Phase 4 completion).
+On pull requests to `main`, `.github/workflows/security-ci.yml` runs:
+
+- [ ] `./scripts/validate-security.sh` — same as local aggregate check.
+- [ ] `./scripts/run-shellcheck.sh` after installing `shellcheck` on the runner (see `docs/security/ci-validation.md`).
+
+Details: **`docs/security/ci-validation.md`**.
