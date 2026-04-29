@@ -15,5 +15,8 @@
     "retain_local_artifacts_only": true
   },
   "initialized_from": "gsd-new-project",
-  "initialized_at_note": "Set by automated new-project initialization flow"
+  "initialized_at_note": "Set by automated new-project initialization flow",
+  "workflow": {
+    "auto_advance": true
+  }
 }
