@@ -21,7 +21,11 @@ docs/**
 !docs/security/
 !docs/security/**
 docs-vault/
-scripts/
+# scripts/ — local tooling noise by default; tracked maintainer scripts excepted
+scripts/**
+!scripts/bump.sh
+!scripts/pre-commit
+!scripts/pre-commit-guard.sh
 tests/
 .claude-plugin/
 .firecrawl/
