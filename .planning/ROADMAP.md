@@ -18,7 +18,8 @@
 **Goal:** Add a GitHub Actions workflow that runs on pull requests and executes `./scripts/validate-security.sh` on a Linux runner with clear logs and least-privilege permissions.
 
 **Requirements:** CI-01, CI-02, CI-03, CI-04  
-**Depends on:** v1.0 validation scripts and policies (complete).
+**Depends on:** v1.0 validation scripts and policies (complete).  
+**Status:** Complete (2026-04-29) — `.github/workflows/security-ci.yml`, phase `VERIFICATION.md`.
 
 **Success criteria**
 

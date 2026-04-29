@@ -8,10 +8,10 @@
 
 ### CI & GitHub Actions
 
-- [ ] **CI-01**: On pull requests targeting the default branch (and equivalent events agreed in implementation), a GitHub Actions workflow runs automatically.
-- [ ] **CI-02**: The workflow executes `./scripts/validate-security.sh` (or a documented entrypoint that delegates to it) on a Linux runner; non-zero exit fails the job.
-- [ ] **CI-03**: The workflow declares minimal `permissions` appropriate for checkout-and-validate (document rationale if anything broader is required).
-- [ ] **CI-04**: Workflow steps are structured so logs clearly indicate validation vs shellcheck failure (separate steps or equivalent).
+- [x] **CI-01**: On pull requests targeting the default branch (and equivalent events agreed in implementation), a GitHub Actions workflow runs automatically.
+- [x] **CI-02**: The workflow executes `./scripts/validate-security.sh` (or a documented entrypoint that delegates to it) on a Linux runner; non-zero exit fails the job.
+- [x] **CI-03**: The workflow declares minimal `permissions` appropriate for checkout-and-validate (document rationale if anything broader is required).
+- [x] **CI-04**: Workflow steps are structured so logs clearly indicate validation vs shellcheck failure (separate steps or equivalent).
 
 ### Shell validation
 
