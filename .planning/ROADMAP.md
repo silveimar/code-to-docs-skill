@@ -20,6 +20,7 @@
 
 ### Phase 2: Local-Only Guardrails Implementation
 **Goal:** Enforce local-first defaults and block accidental data egress.
+**Requirements:** [FR-1, FR-2, FR-4, NFR-1, NFR-2, NFR-3]
 
 **Deliverables**
 - Config and workflow controls that default to local-only behavior.
