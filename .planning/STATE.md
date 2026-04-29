@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: CI & validation hardening
-status: planning
-last_updated: "2026-04-29T17:39:15.955Z"
-last_activity: 2026-04-29
+milestone_name: milestone
+status: Roadmap approved — ready for discuss-phase / plan-phase
+stopped_at: Phase 5 context gathered
+last_updated: "2026-04-29T18:37:46.906Z"
+last_activity: 2026-04-29 — Milestone v1.1 roadmap created (Phases 5–7)
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # STATE
@@ -47,8 +47,8 @@ Preserved in phase CONTEXT files under `.planning/phases/` and milestone archive
 
 ## Session continuity
 
-- **Stopped at:** Milestone v1.1 planning (requirements/roadmap)
-- **Resume file:** None
+- **Stopped at:** Phase 5 context gathered
+- **Resume file:** .planning/phases/05-pr-ci-workflow-linux-validation-path/05-CONTEXT.md
 
 ## Current Position
 
