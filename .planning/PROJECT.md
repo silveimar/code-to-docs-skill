@@ -10,8 +10,16 @@
 
 ## Current state (after v1.1)
 
-- **Shipped:** v1.1 as above; requirements in `.planning/REQUIREMENTS.md`; roadmap `.planning/ROADMAP.md`.
+- **Shipped:** v1.1 as above; archived requirements [`.planning/milestones/v1.1-REQUIREMENTS.md`](milestones/v1.1-REQUIREMENTS.md); roadmap history [`.planning/milestones/v1.1-ROADMAP.md`](milestones/v1.1-ROADMAP.md).
 - **PR CI:** `.github/workflows/security-ci.yml`; maintainer doc: `docs/security/ci-validation.md`.
+
+## Requirements (validated in v1.1)
+
+Full matrix (CI/SHL/DOC/NFR): see [archived v1.1 requirements](milestones/v1.1-REQUIREMENTS.md). At a glance:
+
+- ✓ **CI-01–CI-04** — PR workflow, validate-security on Linux, minimal permissions, distinct steps for validate vs shellcheck.
+- ✓ **SHL-01–SHL-03** — Scoped shellcheck, severity policy, local `run-shellcheck.sh` parity.
+- ✓ **DOC-01–DOC-02**, **NFR-01–NFR-03** — CI docs, verification artifacts, outbound disclosure, reproducibility, English.
 
 ## Current state (after v1.0)
 

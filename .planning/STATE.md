@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: CI & validation hardening
-status: Milestone v1.1 complete
-stopped_at: Phase 7 complete — docs and verification shipped
-last_updated: "2026-04-29T21:00:00.000Z"
-last_activity: 2026-04-29 — `/gsd-discuss-phase 7 --chain` completed through execution
+status: completed
+stopped_at: Milestone v1.1 documentation phase complete
+last_updated: "2026-04-29T19:38:01.863Z"
+last_activity: 2026-04-29
 progress:
   total_phases: 3
   completed_phases: 3
@@ -55,4 +55,4 @@ Captured in `.planning/phases/*-CONTEXT.md` and phase `VERIFICATION.md` files.
 Phase: **—** (no active phase)  
 Plan: —  
 Status: Milestone **v1.1** requirements and docs complete  
-Last activity: 2026-04-29 — Phase 7 documentation + verification
+Last activity: 2026-04-29

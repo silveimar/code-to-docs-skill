@@ -2,11 +2,11 @@
 
 ## v1.1 CI & validation hardening (Shipped: 2026-04-29)
 
-**Roadmap:** [`.planning/ROADMAP.md`](ROADMAP.md) · **Requirements:** [`.planning/REQUIREMENTS.md`](REQUIREMENTS.md)
+**Archive:** [ROADMAP snapshot](.planning/milestones/v1.1-ROADMAP.md) · [REQUIREMENTS snapshot](.planning/milestones/v1.1-REQUIREMENTS.md)
 
-**Phases completed:** 5–7 (PR CI workflow, shellcheck integration, documentation and verification).
+**Phases completed:** 5–7 (3 phases, 3 plans)
 
-**Summary:** `.github/workflows/security-ci.yml`, `scripts/run-shellcheck.sh`, `docs/security/ci-validation.md`, README and outbound-allowlist updates; phase `VERIFICATION.md` under `.planning/phases/` for Phases 5–7.
+**Summary:** GitHub Actions on PRs to `main` (`security-ci.yml`), `scripts/run-shellcheck.sh`, `docs/security/ci-validation.md`, README and outbound-allowlist updates; phase `VERIFICATION.md` files under `.planning/phases/` for Phases 5–7.
 
 ---
 
