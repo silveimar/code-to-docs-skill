@@ -50,6 +50,8 @@
 
 ### Phase 4: Hardening Validation and Regression Checks
 **Goal:** Ensure security controls remain effective over time.
+**Status:** Implementation complete (2026-04-29); UAT optional
+**Evidence:** `.planning/phases/04-hardening-validation-and-regression-checks/VERIFICATION.md` (PASS), `04-01-SUMMARY.md`
 
 **Deliverables**
 - Repeatable local security validation checklist.

@@ -27,6 +27,7 @@ The project currently has codebase mapping artifacts but no initialized project-
 - Local-only constraints are explicit in requirements and operational rules.
 - Data handling policies cover source code, docs, logs, caches, and exports.
 - Baseline verification and threat checks are integrated into workflows.
+- A **single local command** (`./scripts/validate-security.sh`) plus **regression probe** (`./scripts/security-regression.sh`) and **checklist** (`docs/security/validation-checklist.md`) support repeatable hardening validation (Milestone 1 / Phase 4).
 
 ## Constraints
 - Operate primarily in local environment.
