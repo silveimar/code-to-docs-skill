@@ -30,4 +30,5 @@ tests/
 .claude-plugin/
 .firecrawl/
 .superpowers/
+.claude/
 CLAUDE.md
