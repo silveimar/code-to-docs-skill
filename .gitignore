@@ -14,8 +14,8 @@ output/
 # Obsidian workspace state
 .obsidian/
 
-# Internal — kept local, not distributed
-research/
+# Internal — kept local, not distributed (root only; `.planning/research/` is milestone output)
+/research/
 # docs/ — internal by default; exception for shipped security policy (Phase 2)
 docs/**
 !docs/security/
